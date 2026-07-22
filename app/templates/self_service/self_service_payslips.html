@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}My Payslips{% endblock %}
+{% block content %}
+<h2>My payslips</h2>
+<table class="table table-striped">
+    <thead><tr><th>Period</th><th>Net pay</th><th></th></tr></thead>
+    <tbody>
+        {% for p in payslips %}
+        <tr>
+            <td>{{ p.payroll_run.period_start.strftime('%b %d') }} - {{ p.payroll_run.period_end.strftime('%b %d, %Y') }}</td>
+            <td>{{ "%.2f"|format(p.net_pay) }}</td>
+            <td><a href="{{ url_for('self_service.payslip_detail', payslip_id=p.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">No payslips yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

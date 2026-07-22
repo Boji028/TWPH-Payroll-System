@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, DecimalField, DateField, SubmitField
-from wtforms.validators import DataRequired, Optional, Email
+from wtforms import StringField, SelectField, DecimalField, DateField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Optional, Email, Length
 
 
 class EmployeeForm(FlaskForm):
@@ -23,3 +23,14 @@ class EmployeeForm(FlaskForm):
 
     date_hired = DateField("Date Hired", validators=[DataRequired()])
     submit = SubmitField("Save Employee")
+    
+class EmployeeLoginForm(FlaskForm):
+    """Admin sets/updates the self-service login for one Employee.
+    No email invite — the password is shared with the employee directly."""
+
+    email = StringField("Login email", validators=[DataRequired(), Email()])
+    password = PasswordField(
+        "Password",
+        validators=[Optional(), Length(min=8, message="Use at least 8 characters.")],
+    )
+    submit = SubmitField("Save login")

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Employee Login{% endblock %}
+{% block content %}
+<h2>Login for {{ employee.full_name }}</h2>
+<p class="text-muted">
+    {{ 'Update' if user and user.id else 'Create' }} the account this employee uses to
+    view their own hours and payslips.
+</p>
+<form method="POST" class="col-md-6">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+        <div class="form-text">
+            {% if user and user.id %}
+                Leave blank to keep the current password.
+            {% else %}
+                Share this with the employee directly — there is no email invite.
+            {% endif %}
+        </div>
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from app.decorators import staff_required
 from app.extensions import db
 from app.models.employee import Employee
 from app.models.attendance import Attendance
@@ -9,7 +9,7 @@ attendance_bp = Blueprint("attendance", __name__)
 
 
 @attendance_bp.route("/")
-@login_required
+@staff_required
 def list_attendance():
     date_str = request.args.get("date")
     selected_date = (
@@ -22,7 +22,7 @@ def list_attendance():
 
 
 @attendance_bp.route("/log", methods=["GET", "POST"])
-@login_required
+@staff_required
 def log_attendance():
     employees = Employee.query.filter_by(status="active").order_by(Employee.last_name).all()
     if request.method == "POST":

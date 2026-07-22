@@ -11,6 +11,7 @@
     {% if current_user.is_authenticated %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
+            {% if current_user.role in ('owner', 'hr', 'staff') %}
             <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">Payroll System</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
@@ -18,9 +19,23 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('employee.list_employees') }}">Employees</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('attendance.list_attendance') }}">Attendance</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('payroll.list_runs') }}">Payroll</a></li>
+                    {% if current_user.employee_id %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.dashboard') }}">My Payslips</a></li>
+                    {% endif %}
                 </ul>
                 <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Log Out</a>
             </div>
+            {% else %}
+            <a class="navbar-brand" href="{{ url_for('self_service.dashboard') }}">Payroll System</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.dashboard') }}">My Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.attendance') }}">My Attendance</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.payslips') }}">My Payslips</a></li>
+                </ul>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Log Out</a>
+            </div>
+            {% endif %}
         </div>
     </nav>
     {% endif %}

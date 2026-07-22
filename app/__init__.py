@@ -19,12 +19,14 @@ def create_app(config_name="default"):
     from app.routes.employee_routes import employee_bp
     from app.routes.attendance_routes import attendance_bp
     from app.routes.payroll_routes import payroll_bp
+    from app.routes.self_service_routes import self_service_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(employee_bp, url_prefix="/employees")
     app.register_blueprint(attendance_bp, url_prefix="/attendance")
     app.register_blueprint(payroll_bp, url_prefix="/payroll")
+    app.register_blueprint(self_service_bp, url_prefix="/my")
 
     # Import models so Flask-Migrate can detect them
     from app.models import employee, attendance, payroll, deduction, user

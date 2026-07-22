@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<h2>Welcome, {{ employee.full_name }}</h2>
+<p class="text-muted">
+    {{ employee.position or '' }}{{ ' · ' ~ employee.department if employee.department }}
+</p>
+
+<div class="row g-3 my-3">
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Employee code</div>
+            <div class="fs-5">{{ employee.employee_code }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Pay type</div>
+            <div class="fs-5">{{ employee.pay_type|capitalize }}</div>
+        </div></div>
+    </div>
+</div>
+
+<h5 class="mt-4">Recent payslips</h5>
+<table class="table">
+    <thead><tr><th>Period</th><th>Net pay</th><th></th></tr></thead>
+    <tbody>
+        {% for p in recent_payslips %}
+        <tr>
+            <td>{{ p.payroll_run.period_start.strftime('%b %d') }} - {{ p.payroll_run.period_end.strftime('%b %d, %Y') }}</td>
+            <td>{{ "%.2f"|format(p.net_pay) }}</td>
+            <td><a href="{{ url_for('self_service.payslip_detail', payslip_id=p.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">No payslips yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('self_service.payslips') }}">View all payslips</a>
+{% endblock %}

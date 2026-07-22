@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from app.decorators import staff_required
 from app.extensions import db
 from app.models.payroll import PayrollRun, Payslip
 from app.services.payroll_service import process_payroll_run
@@ -9,14 +9,14 @@ payroll_bp = Blueprint("payroll", __name__)
 
 
 @payroll_bp.route("/")
-@login_required
+@staff_required
 def list_runs():
     runs = PayrollRun.query.order_by(PayrollRun.period_start.desc()).all()
     return render_template("payroll/list.html", runs=runs)
 
 
 @payroll_bp.route("/new", methods=["GET", "POST"])
-@login_required
+@staff_required
 def new_run():
     if request.method == "POST":
         period_start = datetime.strptime(request.form["period_start"], "%Y-%m-%d").date()
@@ -30,14 +30,14 @@ def new_run():
 
 
 @payroll_bp.route("/<int:run_id>")
-@login_required
+@staff_required
 def view_run(run_id):
     run = PayrollRun.query.get_or_404(run_id)
     return render_template("payroll/view.html", run=run)
 
 
 @payroll_bp.route("/<int:run_id>/process", methods=["POST"])
-@login_required
+@staff_required
 def process_run(run_id):
     run = PayrollRun.query.get_or_404(run_id)
     if run.status != "draft":
@@ -50,7 +50,7 @@ def process_run(run_id):
 
 
 @payroll_bp.route("/payslip/<int:payslip_id>")
-@login_required
+@staff_required
 def view_payslip(payslip_id):
     payslip = Payslip.query.get_or_404(payslip_id)
     return render_template("payroll/payslip.html", payslip=payslip)

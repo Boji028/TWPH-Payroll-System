@@ -14,7 +14,11 @@ def login():
         if user and user.check_password(form.password.data) and user.is_active_account:
             login_user(user)
             next_page = request.args.get("next")
-            return redirect(next_page or url_for("main.dashboard"))
+            if next_page:
+                return redirect(next_page)
+            if user.role == "employee":
+                return redirect(url_for("self_service.dashboard"))
+            return redirect(url_for("main.dashboard"))
         flash("Invalid email or password.", "danger")
     return render_template("auth/login.html", form=form)
 
