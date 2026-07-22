@@ -3,6 +3,8 @@ User account is linked to via User.employee_id. Any authenticated user
 with an employee_id can reach these, regardless of role, so an owner or
 HR staffer who also has an Employee record can use their own self-service
 view too."""
+import requests
+from app.models.employee_document import EmployeeDocument
 from io import BytesIO
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
@@ -93,3 +95,24 @@ def leave():
         return redirect(url_for("self_service.leave"))
     requests = employee.leave_requests.order_by(LeaveRequest.requested_at.desc()).all()
     return render_template("self_service/leave.html", employee=employee, form=form, requests=requests)
+@self_service_bp.route("/documents")
+@login_required
+def documents():
+    employee = _current_employee()
+    docs = employee.documents.order_by(EmployeeDocument.uploaded_at.desc()).all()
+    return render_template("self_service/documents.html", employee=employee, documents=docs)
+@self_service_bp.route("/documents/<int:document_id>/download")
+@login_required
+def download_document(document_id):
+    employee = _current_employee()
+    document = EmployeeDocument.query.get_or_404(document_id)
+    if document.employee_id != employee.id:
+        abort(403)
+    response = requests.get(document.cloudinary_url)
+    response.raise_for_status()
+    return send_file(
+        BytesIO(response.content),
+        mimetype=response.headers.get("Content-Type", "application/octet-stream"),
+        as_attachment=True,
+        download_name=document.original_filename,
+    )

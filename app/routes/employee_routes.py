@@ -1,9 +1,16 @@
+from flask_login import current_user
+from app.models.employee_document import EmployeeDocument
+from app.forms.document_forms import DocumentUploadForm
+from app.services.document_service import upload_employee_document, delete_employee_document, DocumentUploadError
 from flask import Blueprint, render_template, redirect, url_for, flash
 from app.decorators import staff_required
 from app.extensions import db
 from app.models.employee import Employee
 from app.models.user import User
 from app.forms.employee_forms import EmployeeForm, EmployeeLoginForm
+import requests
+from io import BytesIO
+from flask import send_file
 
 employee_bp = Blueprint("employee", __name__)
 
@@ -96,3 +103,65 @@ def manage_login(employee_id):
         return redirect(url_for("employee.list_employees"))
 
     return render_template("employees/create_login.html", form=form, employee=employee, user=user)
+@employee_bp.route("/<int:employee_id>/documents")
+@staff_required
+def list_documents(employee_id):
+    employee = Employee.query.get_or_404(employee_id)
+    documents = employee.documents.order_by(EmployeeDocument.uploaded_at.desc()).all()
+    form = DocumentUploadForm()
+    return render_template("employees/documents.html", employee=employee, documents=documents, form=form)
+
+
+@employee_bp.route("/<int:employee_id>/documents/upload", methods=["POST"])
+@staff_required
+def upload_document(employee_id):
+    employee = Employee.query.get_or_404(employee_id)
+    form = DocumentUploadForm()
+
+    if not form.validate_on_submit():
+        flash("Please fix the errors and try again.", "danger")
+        return redirect(url_for("employee.list_documents", employee_id=employee.id))
+
+    try:
+        upload_result = upload_employee_document(form.file.data, employee.id)
+    except DocumentUploadError as e:
+        flash(str(e), "danger")
+        return redirect(url_for("employee.list_documents", employee_id=employee.id))
+
+    document = EmployeeDocument(
+        employee_id=employee.id,
+        doc_type=form.doc_type.data,
+        label=form.label.data,
+        expiry_date=form.expiry_date.data,
+        notes=form.notes.data,
+        uploaded_by_id=current_user.id,
+        **upload_result,
+    )
+    db.session.add(document)
+    db.session.commit()
+    flash(f"{document.label} uploaded.", "success")
+    return redirect(url_for("employee.list_documents", employee_id=employee.id))
+
+
+@employee_bp.route("/<int:employee_id>/documents/<int:document_id>/delete", methods=["POST"])
+@staff_required
+def delete_document(employee_id, document_id):
+    document = EmployeeDocument.query.filter_by(id=document_id, employee_id=employee_id).first_or_404()
+    delete_employee_document(document.cloudinary_public_id)
+    db.session.delete(document)
+    db.session.commit()
+    flash(f"{document.label} deleted.", "info")
+    return redirect(url_for("employee.list_documents", employee_id=employee_id))
+
+@employee_bp.route("/<int:employee_id>/documents/<int:document_id>/download")
+@staff_required
+def download_document(employee_id, document_id):
+    document = EmployeeDocument.query.filter_by(id=document_id, employee_id=employee_id).first_or_404()
+    response = requests.get(document.cloudinary_url)
+    response.raise_for_status()
+    return send_file(
+        BytesIO(response.content),
+        mimetype=response.headers.get("Content-Type", "application/octet-stream"),
+        as_attachment=True,
+        download_name=document.original_filename,
+    )
