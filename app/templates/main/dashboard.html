@@ -3,34 +3,122 @@
 {% block content %}
 <h2 class="mb-4">Dashboard</h2>
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h1 class="display-5">{{ active_employee_count }}</h1>
-                <p class="text-muted mb-0">Active Employees</p>
-            </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small mb-1">Active employees</div>
+            <div class="fs-2 fw-bold">{{ active_employee_count }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-coral"><div class="card-body">
+            <div class="text-muted small mb-1">On leave today</div>
+            <div class="fs-2 fw-bold">{{ on_leave_count }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-sky"><div class="card-body">
+            <div class="text-muted small mb-1">Avg. tenure</div>
+            <div class="fs-2 fw-bold">{{ avg_tenure_years }}<span class="fs-6 fw-normal text-muted"> yrs</span></div>
+        </div></div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-mint"><div class="card-body">
+            <div class="text-muted small mb-1">Departments</div>
+            <div class="fs-2 fw-bold">{{ department_breakdown|length }}</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-7">
+        <div class="page-card h-100">
+            <h6 class="mb-3">Net pay by period</h6>
+            <canvas id="payTrendChart" height="140"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="page-card card-sky h-100">
+            <h6 class="mb-3">Headcount by department</h6>
+            <canvas id="deptChart" height="140"></canvas>
         </div>
     </div>
 </div>
 
-<h5>Recent Payroll Runs</h5>
-<table class="table table-striped">
-    <thead>
-        <tr><th>Period</th><th>Status</th><th></th></tr>
-    </thead>
-    <tbody>
-        {% for run in recent_runs %}
-        <tr>
-            <td>{{ run.period_start.strftime('%b %d') }} - {{ run.period_end.strftime('%b %d, %Y') }}</td>
-            <td><span class="badge bg-{{ 'success' if run.status == 'processed' else 'secondary' }}">{{ run.status }}</span></td>
-            <td><a href="{{ url_for('payroll.view_run', run_id=run.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
-        </tr>
-        {% else %}
-        <tr><td colspan="3" class="text-muted">No payroll runs yet.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <h5>Recently hired</h5>
+        <div class="page-card card-coral">
+            {% for e in recent_hires %}
+            <div class="d-flex justify-content-between{{ ' mb-2' if not loop.last }}">
+                <span>{{ e.full_name }}</span>
+                <span class="text-muted small">{{ e.date_hired.strftime('%b %d, %Y') }}</span>
+            </div>
+            {% else %}
+            <span class="text-muted">No employees yet.</span>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <h5>Recent Payroll Runs</h5>
+        <div class="page-card card-mint">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>Period</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for run in recent_runs %}
+                <tr>
+                    <td>{{ run.period_start.strftime('%b %d') }} - {{ run.period_end.strftime('%b %d, %Y') }}</td>
+                    <td><span class="badge bg-{{ 'success' if run.status == 'processed' else 'secondary' }}">{{ run.status }}</span></td>
+                    <td><a href="{{ url_for('payroll.view_run', run_id=run.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">No payroll runs yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
 
 <a href="{{ url_for('payroll.new_run') }}" class="btn btn-primary">Start New Payroll Run</a>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('payTrendChart'), {
+    type: 'line',
+    data: {
+        labels: {{ pay_trend|map(attribute='label')|list|tojson }},
+        datasets: [{
+            label: 'Net pay',
+            data: {{ pay_trend|map(attribute='total')|list|tojson }},
+            borderColor: '#7C3AED',
+            backgroundColor: 'rgba(124, 58, 237, 0.12)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+new Chart(document.getElementById('deptChart'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ department_breakdown|map(attribute='label')|list|tojson }},
+        datasets: [{
+            data: {{ department_breakdown|map(attribute='count')|list|tojson }},
+            backgroundColor: ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#F59E0B', '#6366F1']
+        }]
+    },
+    options: {
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+</script>
 {% endblock %}

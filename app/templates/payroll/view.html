@@ -13,7 +13,8 @@
 {% endif %}
 
 <h5>Payslips</h5>
-<table class="table table-striped">
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Employee</th><th>Gross</th><th>Deductions</th><th>Net Pay</th><th></th></tr>
     </thead>
@@ -31,4 +32,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

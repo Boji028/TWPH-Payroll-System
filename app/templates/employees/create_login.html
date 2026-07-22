@@ -6,7 +6,8 @@
     {{ 'Update' if user and user.id else 'Create' }} the account this employee uses to
     view their own hours and payslips.
 </p>
-<form method="POST" class="col-md-6">
+<div class="page-card card-coral col-md-7">
+<form method="POST">
     {{ form.hidden_tag() }}
     <div class="mb-3">
         {{ form.email.label(class="form-label") }}
@@ -25,4 +26,5 @@
     </div>
     {{ form.submit(class="btn btn-primary") }}
 </form>
+</div>
 {% endblock %}

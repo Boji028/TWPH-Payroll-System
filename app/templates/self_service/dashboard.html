@@ -14,7 +14,7 @@
         </div></div>
     </div>
     <div class="col-md-4">
-        <div class="card"><div class="card-body">
+        <div class="card card-sky"><div class="card-body">
             <div class="text-muted small">Pay type</div>
             <div class="fs-5">{{ employee.pay_type|capitalize }}</div>
         </div></div>
@@ -22,7 +22,8 @@
 </div>
 
 <h5 class="mt-4">Recent payslips</h5>
-<table class="table">
+<div class="page-card card-mint">
+<table class="table mb-0">
     <thead><tr><th>Period</th><th>Net pay</th><th></th></tr></thead>
     <tbody>
         {% for p in recent_payslips %}
@@ -36,5 +37,6 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 <a href="{{ url_for('self_service.payslips') }}">View all payslips</a>
 {% endblock %}

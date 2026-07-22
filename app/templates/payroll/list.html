@@ -6,7 +6,8 @@
     <a href="{{ url_for('payroll.new_run') }}" class="btn btn-primary">+ New Run</a>
 </div>
 
-<table class="table table-striped">
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Period</th><th>Status</th><th></th></tr>
     </thead>
@@ -22,4 +23,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

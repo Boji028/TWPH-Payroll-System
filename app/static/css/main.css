@@ -1,8 +1,9 @@
 /* Project-wide styles for the internal app (post-login). Reuses the same
-   design tokens as the public landing page (Option K — purple/sky, Pogonia
-   headings) so the app doesn't feel like two different products. Most of
-   this works by overriding Bootstrap's own CSS variables and utility
-   classes rather than touching every template. */
+   design tokens as the public landing page (Option K — purple/sky/coral/mint,
+   Pogonia headings, pastel chip-cards) so the whole product feels like one
+   thing, not two. Most pages get this by wrapping their content in .card
+   (or a .card-sky/.card-coral/.card-mint variant) rather than per-template
+   custom CSS. */
 
 @font-face {
     font-family: 'Pogonia';
@@ -21,6 +22,11 @@
     --app-gray: #6B6685;
     --app-line: #E3E1EF;
 
+    --app-chip-purple: #F3EEFE;
+    --app-chip-sky: #E6F6FE;
+    --app-chip-coral: #FEECEE;
+    --app-chip-mint: #E7F9F1;
+
     --bs-primary: var(--app-purple);
     --bs-primary-rgb: 124, 58, 237;
     --bs-link-color: var(--app-purple);
@@ -33,28 +39,26 @@ body {
     color: var(--app-ink);
 }
 
+/* Bigger, bolder headings — matching the landing page's headline scale */
+h1, .h1 { font-size: 2.6rem; font-weight: 700; }
+h2, .h2 { font-size: 2.1rem; font-weight: 700; }
+h3, .h3 { font-size: 1.6rem; font-weight: 700; }
+h4, .h4 { font-size: 1.35rem; font-weight: 700; }
+h5, .h5 { font-size: 1.1rem; font-weight: 700; }
 h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title {
     font-family: 'Pogonia', 'Inter', sans-serif;
 }
 
-/* Navbar — swapped from Bootstrap's dark default to Option K's white/purple */
+/* Navbar */
 .app-nav {
     background: #fff;
     border-bottom: 1px solid var(--app-line);
     padding-top: .75rem;
     padding-bottom: .75rem;
 }
-.app-nav .navbar-brand {
-    font-weight: 700;
-    color: var(--app-ink);
-}
-.app-nav .nav-link {
-    color: var(--app-ink);
-}
-.app-nav .nav-link:hover,
-.app-nav .nav-link.active {
-    color: var(--app-purple);
-}
+.app-nav .navbar-brand { font-weight: 700; color: var(--app-ink); }
+.app-nav .nav-link { color: var(--app-ink); }
+.app-nav .nav-link:hover, .app-nav .nav-link.active { color: var(--app-purple); }
 .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -74,10 +78,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title {
     color: var(--app-ink);
     background: transparent;
 }
-.btn-outline-app:hover {
-    background: var(--app-ink);
-    color: #fff;
-}
+.btn-outline-app:hover { background: var(--app-ink); color: #fff; }
 
 /* Buttons */
 .btn-primary {
@@ -88,35 +89,39 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title {
     background-color: var(--app-purple-dark);
     border-color: var(--app-purple-dark);
 }
-.btn-outline-primary {
-    color: var(--app-purple);
-    border-color: var(--app-purple);
-}
-.btn-outline-primary:hover {
-    background-color: var(--app-purple);
-    border-color: var(--app-purple);
-}
-.btn-success {
-    background-color: var(--app-mint);
-    border-color: var(--app-mint);
-}
-.btn-success:hover {
-    background-color: #0D9268;
-    border-color: #0D9268;
-}
+.btn-outline-primary { color: var(--app-purple); border-color: var(--app-purple); }
+.btn-outline-primary:hover { background-color: var(--app-purple); border-color: var(--app-purple); }
+.btn-success { background-color: var(--app-mint); border-color: var(--app-mint); }
+.btn-success:hover { background-color: #0D9268; border-color: #0D9268; }
 
-/* Cards */
+/* Cards — pastel by default, matching the landing page's chip-cards */
 .card {
-    border: 1px solid var(--app-line);
-    border-radius: 14px;
+    background: var(--app-chip-purple);
+    border: none;
+    border-radius: 18px;
 }
+.card-sky { background: var(--app-chip-sky); }
+.card-coral { background: var(--app-chip-coral); }
+.card-mint { background: var(--app-chip-mint); }
+.card-body { padding: 1.5rem; }
 
-/* Badges */
-.badge.bg-success { background-color: var(--app-mint) !important; }
-.badge.bg-secondary { background-color: var(--app-gray) !important; }
-.badge.bg-danger { background-color: var(--app-coral) !important; }
+/* Forms and list pages that aren't naturally a Bootstrap .card get one
+   via this wrapper class, applied in the template around the content. */
+.page-card {
+    background: var(--app-chip-purple);
+    border-radius: 18px;
+    padding: 1.75rem 2rem;
+}
+.page-card.card-sky { background: var(--app-chip-sky); }
+.page-card.card-coral { background: var(--app-chip-coral); }
+.page-card.card-mint { background: var(--app-chip-mint); }
 
-/* Tables */
+/* Tables inside a pastel card need a white inset so rows stay readable */
+.page-card table, .card table {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
 .table thead th {
     color: var(--app-gray);
     font-size: .74rem;
@@ -125,3 +130,15 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title {
     font-weight: 600;
     border-bottom-width: 1px;
 }
+
+/* Form controls need to read clearly against a pastel card background */
+.page-card .form-control, .page-card .form-select,
+.card .form-control, .card .form-select {
+    background: #fff;
+    border: 1px solid rgba(26, 21, 51, .12);
+}
+
+/* Badges */
+.badge.bg-success { background-color: var(--app-mint) !important; }
+.badge.bg-secondary { background-color: var(--app-gray) !important; }
+.badge.bg-danger { background-color: var(--app-coral) !important; }

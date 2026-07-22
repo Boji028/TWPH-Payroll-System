@@ -3,7 +3,8 @@
 {% block content %}
 <h2 class="mb-4">{{ 'Edit' if mode == 'edit' else 'Add' }} Employee</h2>
 
-<form method="POST" class="col-md-6">
+<div class="page-card col-md-7">
+<form method="POST">
     {{ form.hidden_tag() }}
 
     <div class="row mb-3">
@@ -69,4 +70,5 @@
     {{ form.submit(class="btn btn-primary") }}
     <a href="{{ url_for('employee.list_employees') }}" class="btn btn-outline-secondary">Cancel</a>
 </form>
+</div>
 {% endblock %}

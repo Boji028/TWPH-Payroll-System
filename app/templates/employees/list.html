@@ -6,7 +6,8 @@
     <a href="{{ url_for('employee.create_employee') }}" class="btn btn-primary">+ Add Employee</a>
 </div>
 
-<table class="table table-striped">
+<div class="page-card">
+<table class="table table-striped mb-0">
     <thead>
         <tr>
             <th>Code</th><th>Name</th><th>Department</th><th>Pay Type</th><th>Status</th><th></th>
@@ -30,4 +31,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

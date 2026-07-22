@@ -3,7 +3,8 @@
 {% block content %}
 <h2 class="mb-4">My leave requests</h2>
 
-<form method="POST" class="col-md-6 mb-5">
+<div class="page-card card-coral col-md-7 mb-5">
+<form method="POST">
     {{ form.hidden_tag() }}
     <div class="mb-3">
         {{ form.leave_type.label(class="form-label") }}
@@ -27,9 +28,11 @@
     </div>
     {{ form.submit(class="btn btn-primary") }}
 </form>
+</div>
 
 <h5>History</h5>
-<table class="table table-striped">
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Type</th><th>Dates</th><th>Reason</th><th>Status</th></tr>
     </thead>
@@ -46,4 +49,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

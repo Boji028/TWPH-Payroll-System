@@ -2,8 +2,8 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import current_user
 from app.decorators import staff_required
-from app.models.employee import Employee
 from app.models.payroll import PayrollRun
+from app.services.dashboard_service import get_dashboard_stats
 
 main_bp = Blueprint("main", __name__)
 
@@ -20,10 +20,6 @@ def index():
 @main_bp.route("/dashboard")
 @staff_required
 def dashboard():
-    active_employee_count = Employee.query.filter_by(status="active").count()
+    stats = get_dashboard_stats()
     recent_runs = PayrollRun.query.order_by(PayrollRun.period_start.desc()).limit(5).all()
-    return render_template(
-        "main/dashboard.html",
-        active_employee_count=active_employee_count,
-        recent_runs=recent_runs,
-    )
+    return render_template("main/dashboard.html", recent_runs=recent_runs, **stats)

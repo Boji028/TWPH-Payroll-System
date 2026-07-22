@@ -3,6 +3,7 @@
 {% block content %}
 <h2 class="mb-4">Log Attendance</h2>
 
+<div class="page-card card-sky">
 <form method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3 col-md-3">
@@ -37,4 +38,5 @@
 
     <button type="submit" class="btn btn-primary">Save Attendance</button>
 </form>
+</div>
 {% endblock %}

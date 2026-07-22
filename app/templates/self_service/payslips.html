@@ -2,7 +2,8 @@
 {% block title %}My Payslips{% endblock %}
 {% block content %}
 <h2>My payslips</h2>
-<table class="table table-striped">
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
     <thead><tr><th>Period</th><th>Net pay</th><th></th></tr></thead>
     <tbody>
         {% for p in payslips %}
@@ -16,4 +17,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

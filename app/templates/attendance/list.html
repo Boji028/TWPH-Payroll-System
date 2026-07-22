@@ -6,7 +6,8 @@
     <a href="{{ url_for('attendance.log_attendance') }}" class="btn btn-primary">Log Attendance</a>
 </div>
 
-<table class="table table-striped">
+<div class="page-card">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Employee</th><th>Status</th><th>Hours</th><th>Overtime</th></tr>
     </thead>
@@ -23,4 +24,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

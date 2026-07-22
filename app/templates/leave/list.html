@@ -4,7 +4,8 @@
 <h2 class="mb-4">Leave requests</h2>
 
 <h5>Pending</h5>
-<table class="table table-striped">
+<div class="page-card card-coral">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Employee</th><th>Type</th><th>Dates</th><th>Reason</th><th></th></tr>
     </thead>
@@ -31,9 +32,11 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 <h5 class="mt-4">Recently reviewed</h5>
-<table class="table table-striped">
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
     <thead>
         <tr><th>Employee</th><th>Type</th><th>Dates</th><th>Status</th></tr>
     </thead>
@@ -50,4 +53,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}
