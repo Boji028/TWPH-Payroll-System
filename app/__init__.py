@@ -1,7 +1,7 @@
 from flask import Flask
 from app.config import config
 from app.extensions import db, login_manager, csrf, migrate
-
+import cloudinary
 
 def create_app(config_name="default"):
     app = Flask(__name__)
@@ -12,6 +12,7 @@ def create_app(config_name="default"):
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
+    cloudinary.config(secure=True)
 
     # Register blueprints
     from app.routes.auth_routes import auth_bp
