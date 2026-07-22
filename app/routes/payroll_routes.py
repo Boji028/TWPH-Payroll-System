@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from io import BytesIO
+from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file
 from app.decorators import staff_required
 from app.extensions import db
 from app.models.payroll import PayrollRun, Payslip
 from app.services.payroll_service import process_payroll_run
+from app.services.pdf_service import render_payslip_pdf
 from datetime import datetime
 
 payroll_bp = Blueprint("payroll", __name__)
@@ -54,3 +56,14 @@ def process_run(run_id):
 def view_payslip(payslip_id):
     payslip = Payslip.query.get_or_404(payslip_id)
     return render_template("payroll/payslip.html", payslip=payslip)
+
+
+@payroll_bp.route("/payslip/<int:payslip_id>/pdf")
+@staff_required
+def download_payslip_pdf(payslip_id):
+    payslip = Payslip.query.get_or_404(payslip_id)
+    pdf_bytes = render_payslip_pdf(payslip)
+    filename = f"payslip-{payslip.employee.employee_code}-{payslip.payroll_run.period_start}.pdf"
+    return send_file(
+        BytesIO(pdf_bytes), mimetype="application/pdf", as_attachment=True, download_name=filename
+    )

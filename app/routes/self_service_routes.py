@@ -3,10 +3,12 @@ User account is linked to via User.employee_id. Any authenticated user
 with an employee_id can reach these, regardless of role, so an owner or
 HR staffer who also has an Employee record can use their own self-service
 view too."""
-from flask import Blueprint, render_template, abort
+from io import BytesIO
+from flask import Blueprint, render_template, abort, send_file
 from flask_login import login_required, current_user
 from app.models.payroll import Payslip
 from app.models.attendance import Attendance
+from app.services.pdf_service import render_payslip_pdf
 
 self_service_bp = Blueprint("self_service", __name__)
 
@@ -55,3 +57,17 @@ def payslip_detail(payslip_id):
     if payslip.employee_id != employee.id:
         abort(403)
     return render_template("self_service/payslip_detail.html", payslip=payslip)
+
+
+@self_service_bp.route("/payslips/<int:payslip_id>/pdf")
+@login_required
+def payslip_pdf(payslip_id):
+    employee = _current_employee()
+    payslip = Payslip.query.get_or_404(payslip_id)
+    if payslip.employee_id != employee.id:
+        abort(403)
+    pdf_bytes = render_payslip_pdf(payslip)
+    filename = f"payslip-{payslip.payroll_run.period_start}.pdf"
+    return send_file(
+        BytesIO(pdf_bytes), mimetype="application/pdf", as_attachment=True, download_name=filename
+    )
