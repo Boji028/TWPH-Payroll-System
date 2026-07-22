@@ -1,11 +1,127 @@
-/* Project-specific overrides on top of Bootstrap.
-   Keep this thin — most styling should use Bootstrap utility classes
-   directly in templates rather than custom CSS here. */
+/* Project-wide styles for the internal app (post-login). Reuses the same
+   design tokens as the public landing page (Option K — purple/sky, Pogonia
+   headings) so the app doesn't feel like two different products. Most of
+   this works by overriding Bootstrap's own CSS variables and utility
+   classes rather than touching every template. */
 
-body {
-    background-color: #f8f9fa;
+@font-face {
+    font-family: 'Pogonia';
+    src: url('../fonts/Pogonia.ttf') format('truetype');
+    font-weight: 400 700;
+    font-display: swap;
 }
 
-.navbar-brand {
+:root {
+    --app-purple: #7C3AED;
+    --app-purple-dark: #6425D0;
+    --app-sky: #0EA5E9;
+    --app-coral: #FB7185;
+    --app-mint: #10B981;
+    --app-ink: #1A1533;
+    --app-gray: #6B6685;
+    --app-line: #E3E1EF;
+
+    --bs-primary: var(--app-purple);
+    --bs-primary-rgb: 124, 58, 237;
+    --bs-link-color: var(--app-purple);
+    --bs-link-hover-color: var(--app-purple-dark);
+    --bs-body-font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #FAFAFC;
+    color: var(--app-ink);
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title {
+    font-family: 'Pogonia', 'Inter', sans-serif;
+}
+
+/* Navbar — swapped from Bootstrap's dark default to Option K's white/purple */
+.app-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--app-line);
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+}
+.app-nav .navbar-brand {
+    font-weight: 700;
+    color: var(--app-ink);
+}
+.app-nav .nav-link {
+    color: var(--app-ink);
+}
+.app-nav .nav-link:hover,
+.app-nav .nav-link.active {
+    color: var(--app-purple);
+}
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--app-purple), var(--app-sky));
+    color: #fff;
+    font-family: 'Pogonia', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.btn-outline-app {
+    border: 1.5px solid var(--app-ink);
+    color: var(--app-ink);
+    background: transparent;
+}
+.btn-outline-app:hover {
+    background: var(--app-ink);
+    color: #fff;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--app-purple);
+    border-color: var(--app-purple);
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--app-purple-dark);
+    border-color: var(--app-purple-dark);
+}
+.btn-outline-primary {
+    color: var(--app-purple);
+    border-color: var(--app-purple);
+}
+.btn-outline-primary:hover {
+    background-color: var(--app-purple);
+    border-color: var(--app-purple);
+}
+.btn-success {
+    background-color: var(--app-mint);
+    border-color: var(--app-mint);
+}
+.btn-success:hover {
+    background-color: #0D9268;
+    border-color: #0D9268;
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--app-line);
+    border-radius: 14px;
+}
+
+/* Badges */
+.badge.bg-success { background-color: var(--app-mint) !important; }
+.badge.bg-secondary { background-color: var(--app-gray) !important; }
+.badge.bg-danger { background-color: var(--app-coral) !important; }
+
+/* Tables */
+.table thead th {
+    color: var(--app-gray);
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
     font-weight: 600;
+    border-bottom-width: 1px;
 }
