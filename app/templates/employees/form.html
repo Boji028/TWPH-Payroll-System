@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Employee{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ 'Edit' if mode == 'edit' else 'Add' }} Employee</h2>
+
+<form method="POST" class="col-md-6">
+    {{ form.hidden_tag() }}
+
+    <div class="row mb-3">
+        <div class="col">
+            {{ form.employee_code.label(class="form-label") }}
+            {{ form.employee_code(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            {{ form.first_name.label(class="form-label") }}
+            {{ form.first_name(class="form-control") }}
+        </div>
+        <div class="col">
+            {{ form.last_name.label(class="form-label") }}
+            {{ form.last_name(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            {{ form.department.label(class="form-label") }}
+            {{ form.department(class="form-control") }}
+        </div>
+        <div class="col">
+            {{ form.position.label(class="form-label") }}
+            {{ form.position(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form.pay_type.label(class="form-label") }}
+        {{ form.pay_type(class="form-select") }}
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            {{ form.monthly_rate.label(class="form-label") }}
+            {{ form.monthly_rate(class="form-control") }}
+        </div>
+        <div class="col">
+            {{ form.daily_rate.label(class="form-label") }}
+            {{ form.daily_rate(class="form-control") }}
+        </div>
+        <div class="col">
+            {{ form.hourly_rate.label(class="form-label") }}
+            {{ form.hourly_rate(class="form-control") }}
+        </div>
+    </div>
+    <p class="text-muted small">Fill in only the rate field that matches the selected pay type.</p>
+
+    <div class="mb-3">
+        {{ form.date_hired.label(class="form-label") }}
+        {{ form.date_hired(class="form-control") }}
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('employee.list_employees') }}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+{% endblock %}

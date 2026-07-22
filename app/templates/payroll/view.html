@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Payroll Run{% endblock %}
+{% block content %}
+<h2 class="mb-2">{{ run.period_start.strftime('%b %d') }} - {{ run.period_end.strftime('%b %d, %Y') }}</h2>
+<p><span class="badge bg-{{ 'success' if run.status == 'processed' else 'secondary' }}">{{ run.status }}</span></p>
+
+{% if run.status == 'draft' %}
+<form method="POST" action="{{ url_for('payroll.process_run', run_id=run.id) }}" class="mb-4"
+      onsubmit="return confirm('Process payroll for this period? This will generate payslips for all active employees.');">
+    <button type="submit" class="btn btn-primary">Process Payroll Run</button>
+</form>
+{% endif %}
+
+<h5>Payslips</h5>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Employee</th><th>Gross</th><th>Deductions</th><th>Net Pay</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for p in run.payslips %}
+        <tr>
+            <td>{{ p.employee.full_name }}</td>
+            <td>{{ "%.2f"|format(p.gross_pay) }}</td>
+            <td>{{ "%.2f"|format(p.total_deductions) }}</td>
+            <td>{{ "%.2f"|format(p.net_pay) }}</td>
+            <td><a href="{{ url_for('payroll.view_payslip', payslip_id=p.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Not processed yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

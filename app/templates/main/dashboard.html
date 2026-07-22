@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h1 class="display-5">{{ active_employee_count }}</h1>
+                <p class="text-muted mb-0">Active Employees</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5>Recent Payroll Runs</h5>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Period</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for run in recent_runs %}
+        <tr>
+            <td>{{ run.period_start.strftime('%b %d') }} - {{ run.period_end.strftime('%b %d, %Y') }}</td>
+            <td><span class="badge bg-{{ 'success' if run.status == 'processed' else 'secondary' }}">{{ run.status }}</span></td>
+            <td><a href="{{ url_for('payroll.view_run', run_id=run.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">No payroll runs yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('payroll.new_run') }}" class="btn btn-primary">Start New Payroll Run</a>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Payslip{% endblock %}
+{% block content %}
+<div class="card col-md-6 shadow-sm">
+    <div class="card-body">
+        <h4>Payslip</h4>
+        <p class="text-muted">{{ payslip.payroll_run.period_start.strftime('%b %d') }} - {{ payslip.payroll_run.period_end.strftime('%b %d, %Y') }}</p>
+        <hr>
+        <p><strong>Employee:</strong> {{ payslip.employee.full_name }} ({{ payslip.employee.employee_code }})</p>
+        <table class="table">
+            <tr><td>Base Pay</td><td class="text-end">{{ "%.2f"|format(payslip.base_pay) }}</td></tr>
+            <tr><td>Overtime Pay</td><td class="text-end">{{ "%.2f"|format(payslip.overtime_pay) }}</td></tr>
+            <tr class="fw-bold"><td>Gross Pay</td><td class="text-end">{{ "%.2f"|format(payslip.gross_pay) }}</td></tr>
+            {% for d in payslip.deductions %}
+            <tr><td>{{ d.description or d.type }}</td><td class="text-end">-{{ "%.2f"|format(d.amount) }}</td></tr>
+            {% endfor %}
+            <tr class="fw-bold table-active"><td>Net Pay</td><td class="text-end">{{ "%.2f"|format(payslip.net_pay) }}</td></tr>
+        </table>
+    </div>
+</div>
+{% endblock %}

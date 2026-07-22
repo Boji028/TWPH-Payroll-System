@@ -1,0 +1,11 @@
+/* Project-specific overrides on top of Bootstrap.
+   Keep this thin — most styling should use Bootstrap utility classes
+   directly in templates rather than custom CSS here. */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
