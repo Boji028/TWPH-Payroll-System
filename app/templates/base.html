@@ -19,6 +19,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('employee.list_employees') }}">Employees</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('attendance.list_attendance') }}">Attendance</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('payroll.list_runs') }}">Payroll</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('leave.list_requests') }}">Leave Requests</a></li>
                     {% if current_user.employee_id %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.dashboard') }}">My Payslips</a></li>
                     {% endif %}
@@ -32,6 +33,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.dashboard') }}">My Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.attendance') }}">My Attendance</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.payslips') }}">My Payslips</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('self_service.leave') }}">My Leave</a></li>
                 </ul>
                 <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Log Out</a>
             </div>

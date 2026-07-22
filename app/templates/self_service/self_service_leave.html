@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My Leave{% endblock %}
+{% block content %}
+<h2 class="mb-4">My leave requests</h2>
+
+<form method="POST" class="col-md-6 mb-5">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.leave_type.label(class="form-label") }}
+        {{ form.leave_type(class="form-select") }}
+    </div>
+    <div class="row">
+        <div class="col mb-3">
+            {{ form.start_date.label(class="form-label") }}
+            {{ form.start_date(class="form-control", type="date") }}
+            {% for error in form.start_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col mb-3">
+            {{ form.end_date.label(class="form-label") }}
+            {{ form.end_date(class="form-control", type="date") }}
+            {% for error in form.end_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+    </div>
+    <div class="mb-3">
+        {{ form.reason.label(class="form-label") }}
+        {{ form.reason(class="form-control") }}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+
+<h5>History</h5>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Type</th><th>Dates</th><th>Reason</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+        {% for r in requests %}
+        <tr>
+            <td>{{ r.leave_type|capitalize }}</td>
+            <td>{{ r.start_date.strftime('%b %d') }} - {{ r.end_date.strftime('%b %d, %Y') }} ({{ r.days_requested }}d)</td>
+            <td>{{ r.reason or '-' }}</td>
+            <td><span class="badge bg-{{ 'success' if r.status == 'approved' else ('danger' if r.status == 'rejected' else 'secondary') }}">{{ r.status }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No leave requests yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

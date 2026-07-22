@@ -4,6 +4,7 @@
 <h2 class="mb-4">New Payroll Run</h2>
 
 <form method="POST" class="col-md-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3">
         <label class="form-label">Period Start</label>
         <input type="date" name="period_start" class="form-control" required>

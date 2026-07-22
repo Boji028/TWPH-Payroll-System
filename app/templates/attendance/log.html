@@ -4,6 +4,7 @@
 <h2 class="mb-4">Log Attendance</h2>
 
 <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3 col-md-3">
         <label class="form-label">Date</label>
         <input type="date" name="date" class="form-control" required>

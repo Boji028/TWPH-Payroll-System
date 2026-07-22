@@ -4,10 +4,13 @@ with an employee_id can reach these, regardless of role, so an owner or
 HR staffer who also has an Employee record can use their own self-service
 view too."""
 from io import BytesIO
-from flask import Blueprint, render_template, abort, send_file
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
+from app.extensions import db
 from app.models.payroll import Payslip
 from app.models.attendance import Attendance
+from app.models.leave import LeaveRequest
+from app.forms.leave_forms import LeaveRequestForm
 from app.services.pdf_service import render_payslip_pdf
 
 self_service_bp = Blueprint("self_service", __name__)
@@ -71,3 +74,22 @@ def payslip_pdf(payslip_id):
     return send_file(
         BytesIO(pdf_bytes), mimetype="application/pdf", as_attachment=True, download_name=filename
     )
+@self_service_bp.route("/leave", methods=["GET", "POST"])
+@login_required
+def leave():
+    employee = _current_employee()
+    form = LeaveRequestForm()
+    if form.validate_on_submit():
+        leave_request = LeaveRequest(
+            employee_id=employee.id,
+            leave_type=form.leave_type.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            reason=form.reason.data,
+        )
+        db.session.add(leave_request)
+        db.session.commit()
+        flash("Leave request submitted.", "success")
+        return redirect(url_for("self_service.leave"))
+    requests = employee.leave_requests.order_by(LeaveRequest.requested_at.desc()).all()
+    return render_template("self_service/leave.html", employee=employee, form=form, requests=requests)

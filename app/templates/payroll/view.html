@@ -7,6 +7,7 @@
 {% if run.status == 'draft' %}
 <form method="POST" action="{{ url_for('payroll.process_run', run_id=run.id) }}" class="mb-4"
       onsubmit="return confirm('Process payroll for this period? This will generate payslips for all active employees.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="btn btn-primary">Process Payroll Run</button>
 </form>
 {% endif %}

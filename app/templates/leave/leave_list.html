@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Leave Requests{% endblock %}
+{% block content %}
+<h2 class="mb-4">Leave requests</h2>
+
+<h5>Pending</h5>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Employee</th><th>Type</th><th>Dates</th><th>Reason</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for r in pending %}
+        <tr>
+            <td>{{ r.employee.full_name }}</td>
+            <td>{{ r.leave_type|capitalize }}</td>
+            <td>{{ r.start_date.strftime('%b %d') }} - {{ r.end_date.strftime('%b %d, %Y') }} ({{ r.days_requested }}d)</td>
+            <td>{{ r.reason or '-' }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('leave.approve', request_id=r.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                </form>
+                <form method="POST" action="{{ url_for('leave.reject', request_id=r.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">No pending requests.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h5 class="mt-4">Recently reviewed</h5>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Employee</th><th>Type</th><th>Dates</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+        {% for r in reviewed %}
+        <tr>
+            <td>{{ r.employee.full_name }}</td>
+            <td>{{ r.leave_type|capitalize }}</td>
+            <td>{{ r.start_date.strftime('%b %d') }} - {{ r.end_date.strftime('%b %d, %Y') }}</td>
+            <td><span class="badge bg-{{ 'success' if r.status == 'approved' else 'secondary' }}">{{ r.status }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">Nothing reviewed yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
