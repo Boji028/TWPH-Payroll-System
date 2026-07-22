@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}My Documents{% endblock %}
+{% block content %}
+<h2 class="mb-4">My documents</h2>
+<div class="page-card card-sky">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Type</th><th>Label</th><th>Uploaded</th><th></th></tr></thead>
+    <tbody>
+        {% for doc in documents %}
+        <tr>
+            <td>{{ doc.doc_type.value|replace('_', ' ')|capitalize }}</td>
+            <td>{{ doc.label }}</td>
+            <td>{{ doc.uploaded_at.strftime('%b %d, %Y') }}</td>
+            <td><a href="{{ url_for('self_service.download_document', document_id=doc.id) }}" class="btn btn-sm btn-outline-secondary">Download</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No documents on file yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

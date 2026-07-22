@@ -1,5 +1,5 @@
 from flask_login import current_user
-from app.models.employee_document import EmployeeDocument
+from app.models.employee_document import EmployeeDocument, DocumentType
 from app.forms.document_forms import DocumentUploadForm
 from app.services.document_service import upload_employee_document, delete_employee_document, DocumentUploadError
 from flask import Blueprint, render_template, redirect, url_for, flash
@@ -130,7 +130,7 @@ def upload_document(employee_id):
 
     document = EmployeeDocument(
         employee_id=employee.id,
-        doc_type=form.doc_type.data,
+        doc_type=DocumentType(form.doc_type.data),
         label=form.label.data,
         expiry_date=form.expiry_date.data,
         notes=form.notes.data,

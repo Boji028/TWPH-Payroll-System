@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ employee.full_name }} - Documents{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ employee.full_name }} - Documents</h2>
+    <a href="{{ url_for('employee.list_employees') }}" class="btn btn-outline-secondary btn-sm">Back to Employees</a>
+</div>
+
+<div class="page-card card-coral col-md-7 mb-5">
+<h5 class="mb-3">Upload document</h5>
+<form method="POST" action="{{ url_for('employee.upload_document', employee_id=employee.id) }}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.doc_type.label(class="form-label") }}
+        {{ form.doc_type(class="form-select") }}
+    </div>
+    <div class="mb-3">
+        {{ form.label.label(class="form-label") }}
+        {{ form.label(class="form-control", placeholder="e.g. SSS ID, Employment Contract") }}
+        {% for error in form.label.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+        {{ form.file.label(class="form-label") }}
+        {{ form.file(class="form-control") }}
+        {% for error in form.file.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+        {{ form.expiry_date.label(class="form-label") }}
+        {{ form.expiry_date(class="form-control", type="date") }}
+    </div>
+    <div class="mb-3">
+        {{ form.notes.label(class="form-label") }}
+        {{ form.notes(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+</div>
+
+<h5>Documents on file</h5>
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Type</th><th>Label</th><th>Uploaded</th><th>Expiry</th><th></th></tr></thead>
+    <tbody>
+        {% for doc in documents %}
+        <tr>
+            <td>{{ doc.doc_type.value|replace('_', ' ')|capitalize }}</td>
+            <td>{{ doc.label }}</td>
+            <td>{{ doc.uploaded_at.strftime('%b %d, %Y') }}</td>
+            <td>
+                {% if doc.expiry_date %}
+                <span class="{{ 'text-danger' if doc.is_expired else ('text-warning' if doc.is_expiring_soon else '') }}">
+                    {{ doc.expiry_date.strftime('%b %d, %Y') }}
+                    {% if doc.is_expired %}(expired){% elif doc.is_expiring_soon %}(soon){% endif %}
+                </span>
+                {% else %}-{% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('employee.download_document', employee_id=employee.id, document_id=doc.id) }}" class="btn btn-sm btn-outline-secondary">Download</a>
+                <form method="POST" action="{{ url_for('employee.delete_document', employee_id=employee.id, document_id=doc.id) }}" class="d-inline" onsubmit="return confirm('Delete this document?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">No documents uploaded yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

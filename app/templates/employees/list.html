@@ -24,6 +24,7 @@
             <td>
                 <a href="{{ url_for('employee.edit_employee', employee_id=e.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <a href="{{ url_for('employee.manage_login', employee_id=e.id) }}" class="btn btn-sm btn-outline-secondary">Login</a>
+                <a href="{{ url_for('employee.list_documents', employee_id=e.id) }}" class="btn btn-sm btn-outline-secondary">Documents</a>
             </td>
         </tr>
         {% else %}
