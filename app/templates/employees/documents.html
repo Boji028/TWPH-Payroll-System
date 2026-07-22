@@ -57,6 +57,7 @@
             <td>
                 <a href="{{ url_for('employee.download_document', employee_id=employee.id, document_id=doc.id) }}" class="btn btn-sm btn-outline-secondary">Download</a>
                 <form method="POST" action="{{ url_for('employee.delete_document', employee_id=employee.id, document_id=doc.id) }}" class="d-inline" onsubmit="return confirm('Delete this document?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                 </form>
             </td>
