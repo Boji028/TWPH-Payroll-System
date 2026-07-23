@@ -1,31 +1,57 @@
 {% extends "base.html" %}
 {% block title %}Attendance{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Attendance &mdash; {{ selected_date.strftime('%B %d, %Y') }}</h2>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2>Attendance &mdash; {{ period_start.strftime('%b') }} {{ period_start.day }} to {{ period_end.strftime('%b') }} {{ period_end.day }}, {{ period_end.year }}</h2>
     <div>
         <a href="{{ url_for('attendance.import_attendance_view') }}" class="btn btn-outline-primary">Import from Scanner</a>
         <a href="{{ url_for('attendance.log_attendance') }}" class="btn btn-primary">Log Attendance</a>
     </div>
 </div>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="{{ url_for('attendance.list_attendance', date=prev_anchor.isoformat()) }}" class="btn btn-sm btn-outline-secondary">&laquo; Previous period</a>
+        <a href="{{ url_for('attendance.list_attendance', date=next_anchor.isoformat()) }}" class="btn btn-sm btn-outline-secondary">Next period &raquo;</a>
+    </div>
+    <span class="text-muted small">Payday: {{ payday.strftime('%B') }} {{ payday.day }}, {{ payday.year }}</span>
+</div>
+
 <div class="page-card">
-<table class="table table-striped mb-0">
+<div class="table-responsive">
+<table class="table table-striped table-sm mb-0 align-middle">
     <thead>
-        <tr><th>Employee</th><th>Status</th><th>Hours</th><th>Overtime</th></tr>
+        <tr>
+            <th class="text-nowrap">Employee</th>
+            {% for d in dates %}
+            <th class="text-center px-2">
+                {{ d.day }}<br>
+                <span class="text-muted" style="font-weight:normal;font-size:0.7em;">{{ d.strftime('%a') }}</span>
+            </th>
+            {% endfor %}
+        </tr>
     </thead>
     <tbody>
-        {% for r in records %}
+        {% for row in rows %}
         <tr>
-            <td>{{ r.employee.full_name }}</td>
-            <td><span class="badge bg-{{ {'present':'success','late':'warning','absent':'danger','leave':'warning','holiday':'info'}.get(r.status, 'secondary') }}{{ ' text-dark' if r.status in ('late','leave','holiday') else '' }}">{{ r.status }}</span></td>
-            <td>{{ r.hours_worked }}</td>
-            <td>{{ r.overtime_hours }}</td>
+            <td class="text-nowrap">{{ row.employee.full_name }}</td>
+            {% for cell in row.cells %}
+            <td class="text-center">
+                {% if cell %}
+                <span class="badge {{ cell.badge_class }}" title="{{ cell.label }}">{{ cell.abbr }}</span>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+            </td>
+            {% endfor %}
         </tr>
         {% else %}
-        <tr><td colspan="4" class="text-muted">No records for this date.</td></tr>
+        <tr><td colspan="{{ dates|length + 1 }}" class="text-muted">No active employees.</td></tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
+</div>
+
+<p class="text-muted small mt-2">P = Present &middot; L = Late &middot; A = Absent &middot; LV = On Leave &middot; H = Holiday &middot; - = no record</p>
 {% endblock %}

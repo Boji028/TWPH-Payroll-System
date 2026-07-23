@@ -11,25 +11,12 @@ derived purely from whether a row exists yet and its status field."""
 from datetime import date as date_cls
 
 from app.models.employee import Employee
-from app.models.attendance import Attendance
+from app.models.attendance import Attendance, STATUS_LABELS as _ATTENDANCE_STATUS_LABELS, STATUS_BADGE_CLASSES as _ATTENDANCE_STATUS_BADGE_CLASSES
 
-STATUS_LABELS = {
-    "present": "Present",
-    "late": "Late",
-    "absent": "Absent",
-    "leave": "On Leave",
-    "holiday": "Holiday",
-    "not_logged": "Not Logged Yet",
-}
-
-STATUS_BADGE_CLASSES = {
-    "present": "bg-success",
-    "late": "bg-warning text-dark",
-    "absent": "bg-danger",
-    "leave": "bg-warning text-dark",
-    "holiday": "bg-info text-dark",
-    "not_logged": "bg-secondary",
-}
+# Workforce adds one pseudo-status ("not_logged") that isn't a real
+# Attendance.status value - it means no row exists yet for today.
+STATUS_LABELS = {**_ATTENDANCE_STATUS_LABELS, "not_logged": "Not Logged Yet"}
+STATUS_BADGE_CLASSES = {**_ATTENDANCE_STATUS_BADGE_CLASSES, "not_logged": "bg-secondary"}
 
 
 def get_workforce_roster(target_date=None, limit=None):

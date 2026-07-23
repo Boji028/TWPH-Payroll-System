@@ -1,6 +1,25 @@
 from datetime import datetime
 from app.extensions import db
 
+# Single source of truth for how a status displays - workforce_service.py
+# and attendance_service.py both build on these instead of keeping their
+# own copies.
+STATUS_LABELS = {
+    "present": "Present",
+    "late": "Late",
+    "absent": "Absent",
+    "leave": "On Leave",
+    "holiday": "Holiday",
+}
+
+STATUS_BADGE_CLASSES = {
+    "present": "bg-success",
+    "late": "bg-warning text-dark",
+    "absent": "bg-danger",
+    "leave": "bg-warning text-dark",
+    "holiday": "bg-info text-dark",
+}
+
 
 class Attendance(db.Model):
     """One row per employee per work day. Only strictly required for

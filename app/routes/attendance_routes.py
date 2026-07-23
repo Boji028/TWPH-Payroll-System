@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.decorators import staff_required
 from app.extensions import db
 from app.models.employee import Employee
 from app.models.attendance import Attendance
+from app.services.attendance_service import get_pay_period, build_attendance_grid
 from app.forms.attendance_import_form import BiometricImportForm
 from app.services.biometric_import_service import import_attendance, BiometricImportError
-from datetime import datetime
 
 attendance_bp = Blueprint("attendance", __name__)
 
@@ -14,12 +15,17 @@ attendance_bp = Blueprint("attendance", __name__)
 @staff_required
 def list_attendance():
     date_str = request.args.get("date")
-    selected_date = (
+    anchor_date = (
         datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else datetime.utcnow().date()
     )
-    records = Attendance.query.filter_by(date=selected_date).all()
+    period_start, period_end, payday = get_pay_period(anchor_date)
+    dates, rows = build_attendance_grid(period_start, period_end)
     return render_template(
-        "attendance/list.html", records=records, selected_date=selected_date
+        "attendance/list.html",
+        dates=dates, rows=rows,
+        period_start=period_start, period_end=period_end, payday=payday,
+        prev_anchor=period_start - timedelta(days=1),
+        next_anchor=period_end + timedelta(days=1),
     )
 
 
