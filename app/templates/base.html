@@ -39,6 +39,7 @@
                 <a class="sidebar-link {{ 'active' if request.endpoint in ('self_service.payslips', 'self_service.payslip_detail') }}" href="{{ url_for('self_service.payslips') }}"><i class="bi bi-file-earmark-text"></i> My Payslips</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint == 'self_service.leave' }}" href="{{ url_for('self_service.leave') }}"><i class="bi bi-calendar-event"></i> My Leave</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint == 'self_service.documents' }}" href="{{ url_for('self_service.documents') }}"><i class="bi bi-folder"></i> My Documents</a>
+                <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('self_service.performance') }}" href="{{ url_for('self_service.performance') }}"><i class="bi bi-star"></i> My Performance</a>
             </nav>
             {% endif %}
             <a class="btn btn-outline-app btn-sm sidebar-logout" href="{{ url_for('auth.logout') }}">Log Out</a>

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ review.title }} - {{ review.employee.full_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">{{ review.title }}</h2>
+        <span class="text-muted">{{ review.employee.full_name }} &middot; {{ review.review_date.strftime('%b %d, %Y') }}</span>
+        <span class="badge bg-{{ 'success' if review.is_finalized else 'secondary' }} ms-2">{{ review.status.value|capitalize }}</span>
+    </div>
+    <a href="{{ url_for('employee.list_reviews', employee_id=review.employee_id) }}" class="btn btn-outline-secondary btn-sm">Back to Reviews</a>
+</div>
+
+<div class="page-card card-mint mb-4">
+<h5 class="mb-3">Ratings <span class="text-muted">(avg. {{ review.average_score or '-' }} / 5)</span></h5>
+<table class="table table-striped mb-0">
+    <thead><tr><th>Category</th><th>Score</th><th>Comment</th></tr></thead>
+    <tbody>
+        {% for rating in review.ratings %}
+        <tr>
+            <td>{{ rating.category_label }}</td>
+            <td>{{ rating.score }} / 5</td>
+            <td>{{ rating.comment or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if review.overall_comments %}
+<hr>
+<h6>Overall comments</h6>
+<p class="mb-0">{{ review.overall_comments }}</p>
+{% endif %}
+</div>
+
+{% if not review.is_finalized %}
+<div class="d-flex gap-2 mb-4">
+    <form method="POST" action="{{ url_for('employee.finalize_review', employee_id=review.employee_id, review_id=review.id) }}" onsubmit="return confirm('Finalize this review? It will become visible to the employee and can no longer be edited.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-success btn-sm">Finalize Review</button>
+    </form>
+    <form method="POST" action="{{ url_for('employee.delete_review', employee_id=review.employee_id, review_id=review.id) }}" onsubmit="return confirm('Delete this draft review?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Delete Draft</button>
+    </form>
+</div>
+{% endif %}
+
+<h5>Add a goal</h5>
+<div class="page-card card-sky col-md-8 mb-4">
+<form method="POST" action="{{ url_for('employee.add_goal', employee_id=review.employee_id, review_id=review.id) }}">
+    {{ goal_form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-8 mb-2">
+            {{ goal_form.description.label(class="form-label") }}
+            {{ goal_form.description(class="form-control", placeholder="e.g. Complete onboarding checklist for new hires") }}
+        </div>
+        <div class="col-md-4 mb-2">
+            {{ goal_form.target_date.label(class="form-label") }}
+            {{ goal_form.target_date(class="form-control", type="date") }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Add Goal</button>
+</form>
+</div>
+
+<h5>Open goals</h5>
+<div class="page-card card-coral">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Goal</th><th>Target</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for goal in open_goals %}
+        <tr>
+            <td>{{ goal.description }}</td>
+            <td>{{ goal.target_date.strftime('%b %d, %Y') if goal.target_date else '-' }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('employee.update_goal_status', employee_id=review.employee_id, goal_id=goal.id) }}" class="d-flex gap-1">
+                    {{ status_form.hidden_tag() }}
+                    <input type="hidden" name="review_id" value="{{ review.id }}">
+                    {{ status_form.status(class="form-select form-select-sm") }}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">No open goals for this employee.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

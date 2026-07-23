@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}My Performance{% endblock %}
+{% block content %}
+<h2 class="mb-4">My Performance Reviews</h2>
+
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Title</th><th>Date</th><th>Avg. Score</th><th></th></tr></thead>
+    <tbody>
+        {% for review in reviews %}
+        <tr>
+            <td>{{ review.title }}</td>
+            <td>{{ review.review_date.strftime('%b %d, %Y') }}</td>
+            <td>{{ review.average_score or '-' }} / 5</td>
+            <td><a href="{{ url_for('self_service.performance_detail', review_id=review.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No reviews yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

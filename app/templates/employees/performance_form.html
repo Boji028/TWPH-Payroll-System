@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}New Review - {{ employee.full_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>New Review - {{ employee.full_name }}</h2>
+    <a href="{{ url_for('employee.list_reviews', employee_id=employee.id) }}" class="btn btn-outline-secondary btn-sm">Back</a>
+</div>
+
+<div class="page-card card-coral col-md-8">
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control", placeholder='e.g. Q3 2026 Review') }}
+            {% for error in form.title.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.review_date.label(class="form-label") }}
+            {{ form.review_date(class="form-control", type="date") }}
+            {% for error in form.review_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+    </div>
+
+    <h5 class="mt-3 mb-3">Ratings</h5>
+    {% for score_field, comment_field in [
+        (form.job_knowledge_score, form.job_knowledge_comment),
+        (form.quality_of_work_score, form.quality_of_work_comment),
+        (form.communication_score, form.communication_comment),
+        (form.teamwork_score, form.teamwork_comment),
+        (form.punctuality_score, form.punctuality_comment),
+    ] %}
+    <div class="row align-items-start mb-2">
+        <div class="col-md-3">
+            {{ score_field.label(class="form-label") }}
+            {{ score_field(class="form-select") }}
+        </div>
+        <div class="col-md-9">
+            {{ comment_field.label(class="form-label") }}
+            {{ comment_field(class="form-control", placeholder="Optional comment") }}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mb-3 mt-3">
+        {{ form.overall_comments.label(class="form-label") }}
+        {{ form.overall_comments(class="form-control", rows=4) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save as Draft</button>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ employee.full_name }} - Performance{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ employee.full_name }} - Performance Reviews</h2>
+    <div>
+        <a href="{{ url_for('employee.create_review', employee_id=employee.id) }}" class="btn btn-primary btn-sm">+ New Review</a>
+        <a href="{{ url_for('employee.list_employees') }}" class="btn btn-outline-secondary btn-sm">Back to Employees</a>
+    </div>
+</div>
+
+{% if open_goals %}
+<h5>Open goals</h5>
+<div class="page-card card-sky mb-4">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Goal</th><th>Target</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for goal in open_goals %}
+        <tr>
+            <td>{{ goal.description }}</td>
+            <td>{{ goal.target_date.strftime('%b %d, %Y') if goal.target_date else '-' }}</td>
+            <td><span class="badge bg-secondary">{{ goal.status_label }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endif %}
+
+<h5>Reviews</h5>
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Title</th><th>Date</th><th>Avg. Score</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+        {% for review in reviews %}
+        <tr>
+            <td>{{ review.title }}</td>
+            <td>{{ review.review_date.strftime('%b %d, %Y') }}</td>
+            <td>{{ review.average_score or '-' }} / 5</td>
+            <td><span class="badge bg-{{ 'success' if review.is_finalized else 'secondary' }}">{{ review.status.value|capitalize }}</span></td>
+            <td><a href="{{ url_for('employee.view_review', employee_id=employee.id, review_id=review.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">No reviews yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

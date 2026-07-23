@@ -32,6 +32,7 @@ def create_app(config_name="default"):
     app.register_blueprint(leave_bp, url_prefix="/leave")
 
     # Import models so Flask-Migrate can detect them
-    from app.models import employee, attendance, payroll, deduction, user, leave
+    from app.models import employee, attendance, payroll, deduction, user, leave, employee_document, performance_review
+    
 
     return app

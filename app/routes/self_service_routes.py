@@ -5,6 +5,7 @@ HR staffer who also has an Employee record can use their own self-service
 view too."""
 import requests
 from app.models.employee_document import EmployeeDocument
+from app.models.performance_review import PerformanceReview, ReviewStatus
 from io import BytesIO
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
@@ -76,6 +77,8 @@ def payslip_pdf(payslip_id):
     return send_file(
         BytesIO(pdf_bytes), mimetype="application/pdf", as_attachment=True, download_name=filename
     )
+
+
 @self_service_bp.route("/leave", methods=["GET", "POST"])
 @login_required
 def leave():
@@ -93,14 +96,18 @@ def leave():
         db.session.commit()
         flash("Leave request submitted.", "success")
         return redirect(url_for("self_service.leave"))
-    requests = employee.leave_requests.order_by(LeaveRequest.requested_at.desc()).all()
-    return render_template("self_service/leave.html", employee=employee, form=form, requests=requests)
+    requests_ = employee.leave_requests.order_by(LeaveRequest.requested_at.desc()).all()
+    return render_template("self_service/leave.html", employee=employee, form=form, requests=requests_)
+
+
 @self_service_bp.route("/documents")
 @login_required
 def documents():
     employee = _current_employee()
     docs = employee.documents.order_by(EmployeeDocument.uploaded_at.desc()).all()
     return render_template("self_service/documents.html", employee=employee, documents=docs)
+
+
 @self_service_bp.route("/documents/<int:document_id>/download")
 @login_required
 def download_document(document_id):
@@ -116,3 +123,25 @@ def download_document(document_id):
         as_attachment=True,
         download_name=document.original_filename,
     )
+
+
+@self_service_bp.route("/performance")
+@login_required
+def performance():
+    employee = _current_employee()
+    reviews = (
+        employee.performance_reviews.filter_by(status=ReviewStatus.FINALIZED)
+        .order_by(PerformanceReview.review_date.desc())
+        .all()
+    )
+    return render_template("self_service/performance_list.html", employee=employee, reviews=reviews)
+
+
+@self_service_bp.route("/performance/<int:review_id>")
+@login_required
+def performance_detail(review_id):
+    employee = _current_employee()
+    review = PerformanceReview.query.get_or_404(review_id)
+    if review.employee_id != employee.id or review.status != ReviewStatus.FINALIZED:
+        abort(403)
+    return render_template("self_service/performance_detail.html", review=review)
