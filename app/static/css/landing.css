@@ -135,3 +135,58 @@ body {
 .landing-footer {
     color: var(--gray);
 }
+
+/* Login page split-hero. Reuses the Option K gradient wash from the
+   landing hero so the two entry points share one visual identity. */
+.auth-split {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-hero {
+    flex: 1 1 45%;
+    background:
+        radial-gradient(circle at 80% 80%, rgba(251, 113, 133, .28), transparent 45%),
+        radial-gradient(circle at 15% 15%, rgba(255, 255, 255, .14), transparent 45%),
+        linear-gradient(135deg, var(--purple), var(--sky));
+    color: #fff;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-hero .brand-name,
+.auth-hero-headline {
+    color: #fff;
+}
+
+.auth-hero .eyebrow {
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+}
+
+.auth-hero-headline {
+    font-size: 2.6rem;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.auth-form-panel {
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.auth-form-card {
+    width: 100%;
+    max-width: 26rem;
+}
+
+@media (max-width: 900px) {
+    .auth-split { flex-direction: column; }
+    .auth-hero { padding: 2.5rem 1.5rem; }
+    .auth-hero-headline { font-size: 2rem; }
+}

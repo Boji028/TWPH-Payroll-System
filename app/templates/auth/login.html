@@ -1,25 +1,62 @@
-{% extends "base.html" %}
-{% block title %}Log In{% endblock %}
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Log In</h4>
-                <form method="POST">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control") }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                    </div>
-                    {{ form.submit(class="btn btn-primary w-100") }}
-                </form>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In — {{ config.BUSINESS_NAME }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+
+<div class="auth-split">
+    <div class="auth-hero">
+        <a class="navbar-brand d-flex align-items-center gap-2 mb-5" href="{{ url_for('main.index') }}">
+            <span class="brand-mark">{{ config.BUSINESS_NAME[:2]|upper }}</span>
+            <span class="brand-name">{{ config.BUSINESS_NAME }}</span>
+        </a>
+        <span class="eyebrow mb-3">Welcome back</span>
+        <h1 class="display auth-hero-headline my-3">Every payday, sorted.</h1>
+        <p class="fs-5" style="color:rgba(255,255,255,.85);max-width:26rem;">
+            Log in to track hours, review pay, and manage time off — all in one place.
+        </p>
+    </div>
+
+    <div class="auth-form-panel">
+        <div class="auth-form-card">
+            <h4 class="display mb-1">Log In</h4>
+            <p class="mb-4" style="color:var(--gray);">Enter your credentials to continue.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control") }}
+                </div>
+                {{ form.submit(class="btn btn-purple w-100") }}
+            </form>
+
+            <a href="{{ url_for('main.index') }}" class="d-block text-center mt-4 small" style="color:var(--gray);">&larr; Back to home</a>
         </div>
     </div>
 </div>
-{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
