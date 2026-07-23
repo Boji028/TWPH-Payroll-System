@@ -13,6 +13,7 @@ class Employee(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     employee_code = db.Column(db.String(20), unique=True, nullable=False)  # e.g. EMP-0001
+    biometric_id = db.Column(db.String(20), unique=True, nullable=True)  # User ID on the fingerprint scanner
     first_name = db.Column(db.String(80), nullable=False)
     last_name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120))

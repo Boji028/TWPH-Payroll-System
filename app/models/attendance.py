@@ -18,7 +18,7 @@ class Attendance(db.Model):
     hours_worked = db.Column(db.Numeric(5, 2), default=0)
     overtime_hours = db.Column(db.Numeric(5, 2), default=0)
 
-    status = db.Column(db.String(20), default="present")  # 'present', 'absent', 'leave', 'holiday'
+    status = db.Column(db.String(20), default="present")  # 'present', 'late', 'absent', 'leave', 'holiday'
     notes = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

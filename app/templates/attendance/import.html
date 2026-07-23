@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Import from Scanner{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Import Attendance from Scanner</h2>
+    <a href="{{ url_for('attendance.list_attendance') }}" class="btn btn-outline-secondary btn-sm">Back to Attendance</a>
+</div>
+
+<div class="page-card card-sky col-md-7 mb-4">
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.file.label(class="form-label") }}
+        {{ form.file(class="form-control") }}
+        {% for error in form.file.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        <div class="form-text">
+            Status is derived by comparing each punch against Scheduling for that date -
+            make sure the relevant dates are scheduled first. Employees without a Scanner
+            User ID set (Employees &rarr; Edit) will be skipped and listed below.
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+</div>
+
+{% if summary %}
+<div class="page-card card-mint mb-3">
+<h5 class="mb-3">Import complete</h5>
+<ul class="mb-0">
+    <li>{{ summary.created }} new attendance record(s) created</li>
+    <li>{{ summary.updated }} existing record(s) updated</li>
+    <li>{{ summary.skipped_no_shift_no_punch }} row(s) skipped (no scheduled shift and no punch - nothing to record)</li>
+</ul>
+</div>
+
+{% if summary.unmatched_scanner_ids %}
+<div class="page-card card-coral mb-3">
+<h6 class="mb-2">Unmatched scanner User IDs</h6>
+<p class="small mb-2">These had punches in the file but no employee has this Scanner User ID set yet:</p>
+<p class="mb-0">{{ summary.unmatched_scanner_ids|join(', ') }}</p>
+</div>
+{% endif %}
+
+{% if summary.needs_review %}
+<div class="page-card card-coral">
+<h6 class="mb-2">Needs manual review</h6>
+<p class="small mb-2">Only one punch was recorded that day, so hours worked couldn't be calculated (set to 0):</p>
+<table class="table table-sm mb-0">
+    <thead><tr><th>Employee</th><th>Date</th></tr></thead>
+    <tbody>
+        {% for r in summary.needs_review %}
+        <tr><td>{{ r.employee }}</td><td>{{ r.date.strftime('%b %d, %Y') }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

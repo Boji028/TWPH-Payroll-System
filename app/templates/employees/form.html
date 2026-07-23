@@ -12,6 +12,11 @@
             {{ form.employee_code.label(class="form-label") }}
             {{ form.employee_code(class="form-control") }}
         </div>
+        <div class="col">
+            {{ form.biometric_id.label(class="form-label") }}
+            {{ form.biometric_id(class="form-control", placeholder="e.g. 1") }}
+            <div class="form-text">{{ form.biometric_id.description }}</div>
+        </div>
     </div>
 
     <div class="row mb-3">

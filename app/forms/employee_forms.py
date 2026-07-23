@@ -5,6 +5,11 @@ from wtforms.validators import DataRequired, Optional, Email, Length
 
 class EmployeeForm(FlaskForm):
     employee_code = StringField("Employee Code", validators=[DataRequired()])
+    biometric_id = StringField(
+        "Scanner User ID",
+        validators=[Optional()],
+        description="The numeric User ID assigned to this person on the fingerprint scanner, if any",
+    )
     first_name = StringField("First Name", validators=[DataRequired()])
     last_name = StringField("Last Name", validators=[DataRequired()])
     email = StringField("Email", validators=[Optional(), Email()])

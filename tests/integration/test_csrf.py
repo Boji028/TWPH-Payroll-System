@@ -64,6 +64,20 @@ def test_log_schedule_form_submits_with_csrf_token(csrf_app, csrf_client):
     assert r.status_code == 302
 
 
+def test_biometric_import_form_submits_with_csrf_token(csrf_app, csrf_client):
+    import io
+    _login(csrf_app, csrf_client)
+    token = _token(csrf_client.get("/attendance/import").get_data(as_text=True))
+    with open("tests/fixtures/sample_biometric_export.xls", "rb") as f:
+        data = {
+            "csrf_token": token,
+            "file": (io.BytesIO(f.read()), "sample.xls"),
+        }
+        r = csrf_client.post("/attendance/import", data=data, content_type="multipart/form-data")
+    assert r.status_code == 200
+    assert "Import complete" in r.get_data(as_text=True)
+
+
 def test_new_payroll_run_form_submits_with_csrf_token(csrf_app, csrf_client):
     _login(csrf_app, csrf_client)
     token = _token(csrf_client.get("/payroll/new").get_data(as_text=True))

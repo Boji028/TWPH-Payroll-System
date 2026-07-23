@@ -3,6 +3,8 @@ from app.decorators import staff_required
 from app.extensions import db
 from app.models.employee import Employee
 from app.models.attendance import Attendance
+from app.forms.attendance_import_form import BiometricImportForm
+from app.services.biometric_import_service import import_attendance, BiometricImportError
 from datetime import datetime
 
 attendance_bp = Blueprint("attendance", __name__)
@@ -50,3 +52,17 @@ def log_attendance():
         flash("Attendance saved.", "success")
         return redirect(url_for("attendance.list_attendance", date=request.form["date"]))
     return render_template("attendance/log.html", employees=employees)
+
+
+@attendance_bp.route("/import", methods=["GET", "POST"])
+@staff_required
+def import_attendance_view():
+    form = BiometricImportForm()
+    if form.validate_on_submit():
+        try:
+            summary = import_attendance(form.file.data.read())
+        except BiometricImportError as e:
+            flash(str(e), "danger")
+            return render_template("attendance/import.html", form=form)
+        return render_template("attendance/import.html", form=BiometricImportForm(), summary=summary)
+    return render_template("attendance/import.html", form=form)

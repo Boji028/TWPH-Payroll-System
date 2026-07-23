@@ -15,6 +15,7 @@ from app.models.attendance import Attendance
 
 STATUS_LABELS = {
     "present": "Present",
+    "late": "Late",
     "absent": "Absent",
     "leave": "On Leave",
     "holiday": "Holiday",
@@ -23,6 +24,7 @@ STATUS_LABELS = {
 
 STATUS_BADGE_CLASSES = {
     "present": "bg-success",
+    "late": "bg-warning text-dark",
     "absent": "bg-danger",
     "leave": "bg-warning text-dark",
     "holiday": "bg-info text-dark",
