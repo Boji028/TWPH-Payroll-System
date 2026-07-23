@@ -22,6 +22,7 @@
                 <a class="sidebar-link {{ 'active' if request.endpoint == 'main.dashboard' }}" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-1x2"></i> Dashboard</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('employee.') }}" href="{{ url_for('employee.list_employees') }}"><i class="bi bi-people"></i> Employees</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('attendance.') }}" href="{{ url_for('attendance.list_attendance') }}"><i class="bi bi-clock-history"></i> Attendance</a>
+                <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('workforce.') }}" href="{{ url_for('workforce.list_workforce') }}"><i class="bi bi-diagram-3"></i> Workforce</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('payroll.') }}" href="{{ url_for('payroll.list_runs') }}"><i class="bi bi-cash-stack"></i> Payroll</a>
                 <a class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('leave.') }}" href="{{ url_for('leave.list_requests') }}"><i class="bi bi-calendar-event"></i> Leave Requests</a>
                 {% if current_user.employee_id %}

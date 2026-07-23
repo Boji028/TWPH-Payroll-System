@@ -4,6 +4,7 @@ from flask_login import current_user
 from app.decorators import staff_required
 from app.models.payroll import PayrollRun
 from app.services.dashboard_service import get_dashboard_stats
+from app.services.workforce_service import get_workforce_roster
 
 main_bp = Blueprint("main", __name__)
 
@@ -22,4 +23,7 @@ def index():
 def dashboard():
     stats = get_dashboard_stats()
     recent_runs = PayrollRun.query.order_by(PayrollRun.period_start.desc()).limit(5).all()
-    return render_template("main/dashboard.html", recent_runs=recent_runs, **stats)
+    workforce_preview = get_workforce_roster(limit=6)
+    return render_template(
+        "main/dashboard.html", recent_runs=recent_runs, workforce_preview=workforce_preview, **stats
+    )

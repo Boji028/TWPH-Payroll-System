@@ -30,6 +30,31 @@
     </div>
 </div>
 
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Workforce</h5>
+    <div>
+        <span class="text-muted small me-2">Real-time &middot; <span id="workforce-updated-at">updating…</span></span>
+        <a href="{{ url_for('workforce.list_workforce') }}" class="btn btn-sm btn-outline-secondary">View Full Roster</a>
+    </div>
+</div>
+<div class="page-card card-mint mb-4">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Employee</th><th>Shift Role</th><th>Department</th><th>Status</th></tr></thead>
+    <tbody id="workforce-table-body">
+        {% for row in workforce_preview %}
+        <tr>
+            <td>{{ row.full_name }}<div class="text-muted small">{{ row.employee_code }}</div></td>
+            <td>{{ row.position }}</td>
+            <td>{{ row.department }}</td>
+            <td><span class="badge {{ row.badge_class }}">{{ row.status_label }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No active employees.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-lg-7">
         <div class="page-card h-100">
@@ -87,6 +112,7 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/workforce.js') }}"></script>
 <script>
 new Chart(document.getElementById('payTrendChart'), {
     type: 'line',
@@ -119,6 +145,13 @@ new Chart(document.getElementById('deptChart'), {
     options: {
         plugins: { legend: { position: 'bottom' } }
     }
+});
+
+initWorkforceWidget({
+    tableBodyId: 'workforce-table-body',
+    dataUrl: "{{ url_for('workforce.data', limit=6) }}",
+    timestampId: 'workforce-updated-at',
+    intervalMs: 20000
 });
 </script>
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Workforce{% endblock %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="mb-1">Workforce</h2>
+    <span class="text-muted small">Real-time status across all active departments &middot; <span id="workforce-updated-at">updating…</span></span>
+</div>
+
+<div class="page-card card-mint">
+<table class="table table-striped mb-0">
+    <thead><tr><th>Employee</th><th>Shift Role</th><th>Department</th><th>Status</th></tr></thead>
+    <tbody id="workforce-table-body">
+        {% for row in roster %}
+        <tr>
+            <td>{{ row.full_name }}<div class="text-muted small">{{ row.employee_code }}</div></td>
+            <td>{{ row.position }}</td>
+            <td>{{ row.department }}</td>
+            <td><span class="badge {{ row.badge_class }}">{{ row.status_label }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No active employees.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/workforce.js') }}"></script>
+<script>
+initWorkforceWidget({
+    tableBodyId: 'workforce-table-body',
+    dataUrl: "{{ url_for('workforce.data') }}",
+    timestampId: 'workforce-updated-at',
+    intervalMs: 20000
+});
+</script>
+{% endblock %}
