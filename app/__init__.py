@@ -23,6 +23,7 @@ def create_app(config_name="default"):
     from app.routes.self_service_routes import self_service_bp
     from app.routes.leave_routes import leave_bp
     from app.routes.workforce_routes import workforce_bp
+    from app.routes.schedule_routes import schedule_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -32,9 +33,10 @@ def create_app(config_name="default"):
     app.register_blueprint(self_service_bp, url_prefix="/my")
     app.register_blueprint(leave_bp, url_prefix="/leave")
     app.register_blueprint(workforce_bp, url_prefix="/workforce")
+    app.register_blueprint(schedule_bp, url_prefix="/schedule")
 
     # Import models so Flask-Migrate can detect them
-    from app.models import employee, attendance, payroll, deduction, user, leave, employee_document, performance_review
+    from app.models import employee, attendance, payroll, deduction, user, leave, employee_document, performance_review, schedule
     
 
     return app

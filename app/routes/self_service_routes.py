@@ -3,9 +3,11 @@ User account is linked to via User.employee_id. Any authenticated user
 with an employee_id can reach these, regardless of role, so an owner or
 HR staffer who also has an Employee record can use their own self-service
 view too."""
+from datetime import date
 import requests
 from app.models.employee_document import EmployeeDocument
 from app.models.performance_review import PerformanceReview, ReviewStatus
+from app.models.schedule import ScheduledShift
 from io import BytesIO
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
@@ -145,3 +147,16 @@ def performance_detail(review_id):
     if review.employee_id != employee.id or review.status != ReviewStatus.FINALIZED:
         abort(403)
     return render_template("self_service/performance_detail.html", review=review)
+
+
+@self_service_bp.route("/schedule")
+@login_required
+def schedule():
+    employee = _current_employee()
+    today = date.today()
+    shifts = (
+        employee.scheduled_shifts.filter(ScheduledShift.date >= today)
+        .order_by(ScheduledShift.date)
+        .all()
+    )
+    return render_template("self_service/schedule.html", employee=employee, shifts=shifts)

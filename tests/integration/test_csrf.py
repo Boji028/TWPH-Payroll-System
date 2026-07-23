@@ -57,6 +57,13 @@ def test_log_attendance_form_submits_with_csrf_token(csrf_app, csrf_client):
     assert r.status_code == 302
 
 
+def test_log_schedule_form_submits_with_csrf_token(csrf_app, csrf_client):
+    _login(csrf_app, csrf_client)
+    token = _token(csrf_client.get("/schedule/log").get_data(as_text=True))
+    r = csrf_client.post("/schedule/log", data={"csrf_token": token, "date": "2026-08-10"})
+    assert r.status_code == 302
+
+
 def test_new_payroll_run_form_submits_with_csrf_token(csrf_app, csrf_client):
     _login(csrf_app, csrf_client)
     token = _token(csrf_client.get("/payroll/new").get_data(as_text=True))
