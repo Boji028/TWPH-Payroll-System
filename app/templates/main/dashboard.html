@@ -139,7 +139,7 @@ new Chart(document.getElementById('deptChart'), {
         labels: {{ department_breakdown|map(attribute='label')|list|tojson }},
         datasets: [{
             data: {{ department_breakdown|map(attribute='count')|list|tojson }},
-            backgroundColor: ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#F59E0B', '#6366F1']
+            backgroundColor: ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#6425D0', '#6B6685']
         }]
     },
     options: {
