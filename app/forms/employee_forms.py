@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, DecimalField, DateField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Optional, Email, Length
+from app.models.schedule import WEEKDAY_LABELS
 
 
 class EmployeeForm(FlaskForm):
@@ -9,6 +10,12 @@ class EmployeeForm(FlaskForm):
         "Scanner User ID",
         validators=[Optional()],
         description="The numeric User ID assigned to this person on the fingerprint scanner, if any",
+    )
+    rest_day = SelectField(
+        "Rest Day",
+        choices=[(i, name) for i, name in WEEKDAY_LABELS.items()],
+        coerce=int,
+        validators=[DataRequired()],
     )
     first_name = StringField("First Name", validators=[DataRequired()])
     last_name = StringField("Last Name", validators=[DataRequired()])

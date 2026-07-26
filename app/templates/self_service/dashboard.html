@@ -6,6 +6,13 @@
     {{ employee.position or '' }}{{ ' · ' ~ employee.department if employee.department }}
 </p>
 
+{% if current_week_assignment %}
+<div class="alert alert-info">
+    This week's schedule: <strong>{{ current_week_assignment.shift_label }}</strong> shift &middot;
+    Rest day: <strong>{{ current_week_assignment.rest_day_label }}</strong>
+</div>
+{% endif %}
+
 <div class="row g-3 my-3">
     <div class="col-md-4">
         <div class="card"><div class="card-body">

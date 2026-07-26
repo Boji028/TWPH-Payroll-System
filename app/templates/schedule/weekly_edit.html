@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Edit Weekly Schedule{% endblock %}
+{% block content %}
+<h2 class="mb-4">Edit Schedule &mdash; {{ employee.full_name }}</h2>
+<p class="text-muted">Week of {{ week_start.strftime('%B %d, %Y') }}</p>
+
+<div class="page-card col-md-5">
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.shift_type.label(class="form-label") }}
+        {{ form.shift_type(class="form-select") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.rest_day.label(class="form-label") }}
+        {{ form.rest_day(class="form-select") }}
+    </div>
+    <p class="text-muted small">
+        This only changes {{ employee.full_name.split(' ')[0] }}'s schedule for this one week.
+        It won't be overwritten by the next weekly rotation, and it doesn't change
+        their permanent default rest day on their employee profile.
+    </p>
+
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('schedule.weekly_schedule', week=week_start.isoformat()) }}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+</div>
+{% endblock %}

@@ -141,7 +141,16 @@ def _minutes_between(a, b):
 
 
 def _derive_status(time_in, shift):
-    """shift is a ScheduledShift or None. Returns 'present', 'late', or 'absent'."""
+    """shift is a ScheduledShift or None. Returns 'present', 'late', or 'absent'.
+
+    IMPORTANT: rest days are represented as "no ScheduledShift row exists
+    for this employee/date" (see WeeklyShiftAssignment and
+    schedule_rotation_service.py) - never a row with some "off" status.
+    That means this `shift is None` branch is the load-bearing guard that
+    keeps rest days from ever being scored "absent". Any future change
+    here (or to how rest days are stored) must preserve that: a rest day
+    must never reach the `time_in is None: return "absent"` branch below.
+    """
     if shift is None:
         return "present" if time_in else None  # None = no basis to judge, caller skips the row
     if time_in is None:

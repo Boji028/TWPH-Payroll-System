@@ -28,6 +28,11 @@ class Employee(db.Model):
 
     date_hired = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(20), default="active")  # 'active', 'inactive', 'terminated'
+    rest_day = db.Column(db.Integer, nullable=False, default=6)
+    # 0=Monday..6=Sunday (date.weekday() convention). Fixed default rest day -
+    # does NOT flip weekly like a WeeklyShiftAssignment.shift_type does. See
+    # schedule.WEEKDAY_LABELS for display and WeeklyShiftAssignment.rest_day
+    # for the per-week (overridable) value actually used week to week.
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     attendance_records = db.relationship("Attendance", backref="employee", lazy="dynamic")

@@ -23,7 +23,11 @@ def calculate_gross_pay(employee: Employee, period_start, period_end) -> dict:
 
     if employee.pay_type == "monthly":
         # Flat rate regardless of attendance, unless you want to prorate
-        # for absences later — that logic would go here.
+        # for absences later — that logic would go here. IMPORTANT: a rest
+        # day is never an Attendance row at all (see WeeklyShiftAssignment /
+        # biometric_import_service._derive_status), so it can't be mistaken
+        # for an absence here either — do not add logic that infers an
+        # absence from a missing Attendance row on a rest day.
         base_pay = employee.monthly_rate or Decimal("0")
         overtime_pay = Decimal("0")
 

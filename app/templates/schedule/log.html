@@ -4,35 +4,61 @@
 <h2 class="mb-4">Schedule Shifts</h2>
 
 <div class="page-card card-sky">
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="mb-3 col-md-3">
-        <label class="form-label">Date</label>
-        <input type="date" name="date" class="form-control" required>
-    </div>
+    <form method="GET" class="d-flex gap-2 align-items-end mb-3">
+        <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" value="{{ selected_date.isoformat() if selected_date else '' }}" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-outline-secondary">Load</button>
+    </form>
 
-    <table class="table">
-        <thead>
-            <tr><th>Employee</th><th>Department</th><th>Shift</th></tr>
-        </thead>
-        <tbody>
-            {% for e in employees %}
-            <tr>
-                <td>{{ e.full_name }}</td>
-                <td>{{ e.department or '-' }}</td>
-                <td>
-                    <select name="shift_{{ e.id }}" class="form-select form-select-sm">
-                        <option value="">-- Not scheduled --</option>
-                        <option value="opening">Opening (8:00 AM - 6:00 PM)</option>
-                        <option value="closing">Closing (11:30 AM - 8:00 PM)</option>
-                    </select>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if selected_date %}
+        <input type="hidden" name="date" value="{{ selected_date.isoformat() }}">
 
-    <button type="submit" class="btn btn-primary">Save Schedule</button>
-</form>
+        {% if rotation_assignments %}
+        <div class="alert alert-warning">
+            The week of {{ rotation_week_start.strftime('%B %d, %Y') }} is managed by
+            <a href="{{ url_for('schedule.weekly_schedule', week=rotation_week_start.isoformat()) }}">Weekly Schedule</a>
+            for {{ rotation_assignments|length }} employee(s), marked below. Their schedule for the
+            whole week can only be changed from Weekly Schedule &mdash; saving here skips them.
+        </div>
+        {% endif %}
+
+        <table class="table">
+            <thead>
+                <tr><th>Employee</th><th>Department</th><th>Shift</th></tr>
+            </thead>
+            <tbody>
+                {% for e in employees %}
+                {% set rotation = rotation_assignments.get(e.id) %}
+                <tr>
+                    <td>{{ e.full_name }}</td>
+                    <td>{{ e.department or '-' }}</td>
+                    <td>
+                        {% if rotation %}
+                        <span class="text-muted small">
+                            Managed by rotation: {{ rotation.shift_label }} &middot;
+                            <a href="{{ url_for('schedule.edit_weekly_assignment', employee_id=e.id, week=rotation_week_start.isoformat()) }}">Edit in Weekly Schedule</a>
+                        </span>
+                        {% else %}
+                        <select name="shift_{{ e.id }}" class="form-select form-select-sm">
+                            <option value="">-- Not scheduled --</option>
+                            <option value="opening">Opening (8:00 AM - 6:00 PM)</option>
+                            <option value="closing">Closing (11:30 AM - 8:00 PM)</option>
+                        </select>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">Save Schedule</button>
+        {% else %}
+        <p class="text-muted mb-0">Pick a date above to schedule shifts.</p>
+        {% endif %}
+    </form>
 </div>
 {% endblock %}

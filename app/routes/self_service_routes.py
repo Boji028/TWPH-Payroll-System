@@ -7,7 +7,7 @@ from datetime import date
 import requests
 from app.models.employee_document import EmployeeDocument
 from app.models.performance_review import PerformanceReview, ReviewStatus
-from app.models.schedule import ScheduledShift
+from app.models.schedule import ScheduledShift, WeeklyShiftAssignment, week_start_for
 from io import BytesIO
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required, current_user
@@ -34,8 +34,14 @@ def dashboard():
     recent_payslips = (
         employee.payslips.order_by(Payslip.created_at.desc()).limit(3).all()
     )
+    current_week_assignment = WeeklyShiftAssignment.query.filter_by(
+        employee_id=employee.id, week_start_date=week_start_for(date.today())
+    ).first()
     return render_template(
-        "self_service/dashboard.html", employee=employee, recent_payslips=recent_payslips
+        "self_service/dashboard.html",
+        employee=employee,
+        recent_payslips=recent_payslips,
+        current_week_assignment=current_week_assignment,
     )
 
 

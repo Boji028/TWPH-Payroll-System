@@ -17,6 +17,10 @@
             {{ form.biometric_id(class="form-control", placeholder="e.g. 1") }}
             <div class="form-text">{{ form.biometric_id.description }}</div>
         </div>
+        <div class="col">
+            {{ form.rest_day.label(class="form-label") }}
+            {{ form.rest_day(class="form-select") }}
+        </div>
     </div>
 
     <div class="row mb-3">
