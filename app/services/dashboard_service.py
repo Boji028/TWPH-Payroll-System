@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models.employee import Employee
 from app.models.payroll import PayrollRun, Payslip
 from app.models.leave import LeaveRequest
+from app.models.attendance import Attendance
 
 
 def get_dashboard_stats():
@@ -57,6 +58,25 @@ def get_dashboard_stats():
         )
         pay_trend.append({"label": run.period_start.strftime("%b %d"), "total": float(total)})
 
+    # Dashboard hero: the most recent payroll run's period + net total.
+    # Reuses the last entry already computed above rather than re-querying.
+    latest_run = recent_runs_chrono[-1] if recent_runs_chrono else None
+    latest_run_total = pay_trend[-1]["total"] if pay_trend else 0
+
+    # "X of Y in today" — active employees whose attendance today is
+    # present or late (i.e. actually clocked in), out of all active
+    # employees. Employees with no attendance row yet, on leave, or
+    # marked absent are not counted as "in".
+    present_today_count = (
+        Attendance.query.join(Employee, Attendance.employee_id == Employee.id)
+        .filter(
+            Employee.status == "active",
+            Attendance.date == today,
+            Attendance.status.in_(("present", "late")),
+        )
+        .count()
+    )
+
     return {
         "active_employee_count": active_employee_count,
         "department_breakdown": department_breakdown,
@@ -64,4 +84,7 @@ def get_dashboard_stats():
         "on_leave_count": on_leave_count,
         "recent_hires": recent_hires,
         "pay_trend": pay_trend,
+        "latest_run": latest_run,
+        "latest_run_total": latest_run_total,
+        "present_today_count": present_today_count,
     }

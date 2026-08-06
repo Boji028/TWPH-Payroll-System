@@ -36,12 +36,12 @@ def _upload(client):
 
 def test_full_import_derives_present_late_absent_from_real_export(db, client):
     staff = _staff()
-    # User 1 ("tinay" in the file): punched 11:26 in / 20:01 out on 2026-05-27,
+    # User 1 in the file: punched 11:26 in / 20:01 out on 2026-05-27,
     # zero punches on 2026-05-26.
-    emp1 = _employee("EMP-001", "1", "Tinay")
-    # User 3 ("jia"): punched exactly 08:15:00 in on 2026-05-28 (grace boundary),
+    emp1 = _employee("EMP-001", "1", "Employee1")
+    # User 3: punched exactly 08:15:00 in on 2026-05-28 (grace boundary),
     # and 08:17:59 in on 2026-05-29 (past grace).
-    emp3 = _employee("EMP-003", "3", "Jia")
+    emp3 = _employee("EMP-003", "3", "Employee3")
     db.session.add_all([staff, emp1, emp3])
     db.session.commit()
 
@@ -82,7 +82,7 @@ def test_full_import_derives_present_late_absent_from_real_export(db, client):
 
 def test_running_import_twice_updates_not_duplicates(db, client):
     staff = _staff()
-    emp = _employee("EMP-001", "1", "Tinay")
+    emp = _employee("EMP-001", "1", "Employee1")
     db.session.add_all([staff, emp])
     db.session.commit()
     db.session.add(ScheduledShift(employee_id=emp.id, date=date(2026, 5, 27), shift_type="closing", created_by_id=staff.id))
@@ -96,13 +96,13 @@ def test_running_import_twice_updates_not_duplicates(db, client):
 
 
 def test_import_route_blocked_for_employee_role(db, client):
-    emp = _employee("EMP-001", "1", "Tinay")
+    emp = _employee("EMP-001", "1", "Employee1")
     db.session.add(emp)
     db.session.commit()
-    user = User(full_name="Tinay", email="tinay@example.com", role="employee", employee_id=emp.id)
-    user.set_password("tinaypass1")
+    user = User(full_name="Employee1", email="employee1@example.com", role="employee", employee_id=emp.id)
+    user.set_password("emp1pass1")
     db.session.add(user)
     db.session.commit()
 
-    login(client, "tinay@example.com", "tinaypass1")
+    login(client, "employee1@example.com", "emp1pass1")
     assert client.get("/attendance/import").status_code == 403

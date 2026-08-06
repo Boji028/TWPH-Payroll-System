@@ -1,119 +1,100 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<h2 class="mb-4">Dashboard</h2>
+<div class="dashboard-content">
+<h2 class="mb-3">Dashboard</h2>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-3 col-sm-6">
-        <div class="card"><div class="card-body">
-            <div class="text-muted small mb-1">Active employees</div>
-            <div class="fs-2 fw-bold">{{ active_employee_count }}</div>
-        </div></div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="card card-coral"><div class="card-body">
-            <div class="text-muted small mb-1">On leave today</div>
-            <div class="fs-2 fw-bold">{{ on_leave_count }}</div>
-        </div></div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="card card-sky"><div class="card-body">
-            <div class="text-muted small mb-1">Avg. tenure</div>
-            <div class="fs-2 fw-bold">{{ avg_tenure_years }}<span class="fs-6 fw-normal text-muted"> yrs</span></div>
-        </div></div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="card card-mint"><div class="card-body">
-            <div class="text-muted small mb-1">Departments</div>
-            <div class="fs-2 fw-bold">{{ department_breakdown|length }}</div>
-        </div></div>
-    </div>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-2">
-    <h5 class="mb-0">Workforce</h5>
+<!-- Hero: current period net payroll -->
+{% if latest_run %}
+<div class="hero-band">
     <div>
-        <span class="text-muted small me-2">Real-time &middot; <span id="workforce-updated-at">updating…</span></span>
-        <a href="{{ url_for('workforce.list_workforce') }}" class="btn btn-sm btn-outline-secondary">View Full Roster</a>
+        <div class="hero-figure">{{ "\u20b1{:,.0f}".format(latest_run_total) }}</div>
+        <div class="hero-label">Net payroll &middot; {{ latest_run.period_start.strftime('%b %d') }}&ndash;{{ latest_run.period_end.strftime('%b %d, %Y') }} period</div>
+    </div>
+    <div class="hero-substats">
+        <div class="hero-substat"><div class="v">{{ active_employee_count }}</div><div class="l">Active employees</div></div>
+        <div class="hero-substat"><div class="v">{{ on_leave_count }}</div><div class="l">On leave today</div></div>
+        <div class="hero-substat"><div class="v">{{ department_breakdown|length }}</div><div class="l">Departments</div></div>
     </div>
 </div>
-<div class="page-card card-mint mb-4">
-<table class="table table-striped mb-0">
-    <thead><tr><th>Employee</th><th>Shift Role</th><th>Department</th><th>Status</th></tr></thead>
-    <tbody id="workforce-table-body">
-        {% for row in workforce_preview %}
-        <tr>
-            <td>{{ row.full_name }}<div class="text-muted small">{{ row.employee_code }}</div></td>
-            <td>{{ row.position }}</td>
-            <td>{{ row.department }}</td>
-            <td><span class="badge {{ row.badge_class }}">{{ row.status_label }}</span></td>
-        </tr>
-        {% else %}
-        <tr><td colspan="4" class="text-muted">No active employees.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% else %}
+<div class="hero-band">
+    <div>
+        <div class="hero-label mb-1">No payroll runs yet</div>
+        <a href="{{ url_for('payroll.new_run') }}" class="btn btn-light btn-sm">Start New Payroll Run</a>
+    </div>
+    <div class="hero-substats">
+        <div class="hero-substat"><div class="v">{{ active_employee_count }}</div><div class="l">Active employees</div></div>
+        <div class="hero-substat"><div class="v">{{ on_leave_count }}</div><div class="l">On leave today</div></div>
+        <div class="hero-substat"><div class="v">{{ department_breakdown|length }}</div><div class="l">Departments</div></div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Workforce strip -->
+<div class="workforce-strip">
+    <div><i class="bi bi-people-fill me-2" style="color: var(--app-purple);"></i><strong>{{ present_today_count }} of {{ active_employee_count }}</strong> in today{% if on_leave_count %} &middot; {{ on_leave_count }} on leave{% endif %}</div>
+    <a href="{{ url_for('workforce.list_workforce') }}" class="btn btn-sm btn-outline-secondary">View Full Roster</a>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-lg-7">
-        <div class="page-card h-100">
-            <h6 class="mb-3">Net pay by period</h6>
-            <canvas id="payTrendChart" height="140"></canvas>
-        </div>
+<!-- Insights -->
+<div class="section-title">Insights</div>
+<div class="segmented">
+    <button type="button" class="active" data-chart="pay">Pay trend</button>
+    <button type="button" data-chart="dept">Headcount</button>
+</div>
+<div class="page-card mb-4">
+    <div id="payWrap">
+        <canvas id="payTrendChart" height="90" role="img" aria-label="Line chart of net pay by pay period"></canvas>
     </div>
-    <div class="col-lg-5">
-        <div class="page-card card-sky h-100">
-            <h6 class="mb-3">Headcount by department</h6>
-            <canvas id="deptChart" height="140"></canvas>
-        </div>
+    <div id="deptWrap" style="display: none;">
+        <div class="d-flex flex-wrap gap-3 mb-2" id="deptLegend" style="font-size: .78rem; color: var(--app-gray);"></div>
+        <canvas id="deptChart" height="90" role="img" aria-label="Doughnut chart of headcount by department"></canvas>
     </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-lg-6">
-        <h5>Recently hired</h5>
-        <div class="page-card card-coral">
+<!-- Activity -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="section-title">Recently hired</div>
+        {% if recent_hires %}
+        <ul class="activity-list">
             {% for e in recent_hires %}
-            <div class="d-flex justify-content-between{{ ' mb-2' if not loop.last }}">
-                <span>{{ e.full_name }}</span>
-                <span class="text-muted small">{{ e.date_hired.strftime('%b %d, %Y') }}</span>
-            </div>
-            {% else %}
-            <span class="text-muted">No employees yet.</span>
+            <li><a href="{{ url_for('employee.edit_employee', employee_id=e.id) }}"><span>{{ e.full_name }}</span><span class="text-muted">{{ e.date_hired.strftime('%b %d, %Y') }}</span></a></li>
             {% endfor %}
-        </div>
+        </ul>
+        {% else %}
+        <p class="text-muted">No employees yet.</p>
+        {% endif %}
     </div>
-    <div class="col-lg-6">
-        <h5>Recent Payroll Runs</h5>
-        <div class="page-card card-mint">
-        <table class="table table-striped mb-0">
-            <thead>
-                <tr><th>Period</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody>
-                {% for run in recent_runs %}
-                <tr>
-                    <td>{{ run.period_start.strftime('%b %d') }} - {{ run.period_end.strftime('%b %d, %Y') }}</td>
-                    <td><span class="badge bg-{{ 'success' if run.status == 'processed' else 'secondary' }}">{{ run.status }}</span></td>
-                    <td><a href="{{ url_for('payroll.view_run', run_id=run.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
-                </tr>
-                {% else %}
-                <tr><td colspan="3" class="text-muted">No payroll runs yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        </div>
+    <div class="col-md-6">
+        <div class="section-title">Recent payroll runs</div>
+        {% if recent_runs %}
+        <ul class="activity-list">
+            {% for run in recent_runs %}
+            <li><a href="{{ url_for('payroll.view_run', run_id=run.id) }}">
+                <span>{{ run.period_start.strftime('%b %d') }} &ndash; {{ run.period_end.strftime('%b %d') }}</span>
+                <span class="status-pill {{ 'status-processed' if run.status in ('processed', 'paid') else 'status-pending' }}">{{ run.status|capitalize }}</span>
+            </a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No payroll runs yet.</p>
+        {% endif %}
     </div>
 </div>
 
 <a href="{{ url_for('payroll.new_run') }}" class="btn btn-primary">Start New Payroll Run</a>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="{{ url_for('static', filename='js/workforce.js') }}"></script>
 <script>
+const deptColors = ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#6425D0', '#6B6685'];
+const deptLabels = {{ department_breakdown|map(attribute='label')|list|tojson }};
+const deptCounts = {{ department_breakdown|map(attribute='count')|list|tojson }};
+
 new Chart(document.getElementById('payTrendChart'), {
     type: 'line',
     data: {
@@ -124,34 +105,40 @@ new Chart(document.getElementById('payTrendChart'), {
             borderColor: '#7C3AED',
             backgroundColor: 'rgba(124, 58, 237, 0.12)',
             fill: true,
-            tension: 0.3
+            tension: 0.3,
+            borderWidth: 2
         }]
     },
     options: {
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
+        scales: { y: { beginAtZero: true, ticks: { callback: v => '\u20b1' + v.toLocaleString() } } }
     }
 });
 
 new Chart(document.getElementById('deptChart'), {
     type: 'doughnut',
     data: {
-        labels: {{ department_breakdown|map(attribute='label')|list|tojson }},
-        datasets: [{
-            data: {{ department_breakdown|map(attribute='count')|list|tojson }},
-            backgroundColor: ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#6425D0', '#6B6685']
-        }]
+        labels: deptLabels,
+        datasets: [{ data: deptCounts, backgroundColor: deptColors }]
     },
-    options: {
-        plugins: { legend: { position: 'bottom' } }
-    }
+    options: { plugins: { legend: { display: false } } }
 });
 
-initWorkforceWidget({
-    tableBodyId: 'workforce-table-body',
-    dataUrl: "{{ url_for('workforce.data', limit=6) }}",
-    timestampId: 'workforce-updated-at',
-    intervalMs: 20000
+const legendEl = document.getElementById('deptLegend');
+deptLabels.forEach((label, i) => {
+    const span = document.createElement('span');
+    span.innerHTML = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${deptColors[i % deptColors.length]};margin-right:5px"></span>${label} ${deptCounts[i]}`;
+    legendEl.appendChild(span);
+});
+
+document.querySelectorAll('.segmented button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const which = btn.dataset.chart;
+        document.getElementById('payWrap').style.display = which === 'pay' ? 'block' : 'none';
+        document.getElementById('deptWrap').style.display = which === 'dept' ? 'block' : 'none';
+    });
 });
 </script>
 {% endblock %}
