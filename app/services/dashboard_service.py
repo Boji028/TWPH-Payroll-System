@@ -84,6 +84,7 @@ def get_dashboard_stats():
         "on_leave_count": on_leave_count,
         "recent_hires": recent_hires,
         "pay_trend": pay_trend,
+        "has_pay_trend_data": any(p["total"] > 0 for p in pay_trend),
         "latest_run": latest_run,
         "latest_run_total": latest_run_total,
         "present_today_count": present_today_count,

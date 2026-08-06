@@ -44,12 +44,12 @@
     <button type="button" data-chart="dept">Headcount</button>
 </div>
 <div class="page-card mb-4">
-    <div id="payWrap">
+   <div id="payWrap">
+        {% if has_pay_trend_data %}
         <canvas id="payTrendChart" height="90" role="img" aria-label="Line chart of net pay by pay period"></canvas>
-    </div>
-    <div id="deptWrap" style="display: none;">
-        <div class="d-flex flex-wrap gap-3 mb-2" id="deptLegend" style="font-size: .78rem; color: var(--app-gray);"></div>
-        <canvas id="deptChart" height="90" role="img" aria-label="Doughnut chart of headcount by department"></canvas>
+        {% else %}
+        <p class="text-muted mb-0 py-4 text-center">No processed payroll runs yet &mdash; the pay trend will appear here once a run is finalized.</p>
+        {% endif %}
     </div>
 </div>
 
@@ -95,25 +95,28 @@ const deptColors = ['#7C3AED', '#0EA5E9', '#FB7185', '#10B981', '#6425D0', '#6B6
 const deptLabels = {{ department_breakdown|map(attribute='label')|list|tojson }};
 const deptCounts = {{ department_breakdown|map(attribute='count')|list|tojson }};
 
-new Chart(document.getElementById('payTrendChart'), {
-    type: 'line',
-    data: {
-        labels: {{ pay_trend|map(attribute='label')|list|tojson }},
-        datasets: [{
-            label: 'Net pay',
-            data: {{ pay_trend|map(attribute='total')|list|tojson }},
-            borderColor: '#7C3AED',
-            backgroundColor: 'rgba(124, 58, 237, 0.12)',
-            fill: true,
-            tension: 0.3,
-            borderWidth: 2
-        }]
-    },
-    options: {
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { callback: v => '\u20b1' + v.toLocaleString() } } }
-    }
-});
+const payCanvas = document.getElementById('payTrendChart');
+if (payCanvas) {
+    new Chart(payCanvas, {
+        type: 'line',
+        data: {
+            labels: {{ pay_trend|map(attribute='label')|list|tojson }},
+            datasets: [{
+                label: 'Net pay',
+                data: {{ pay_trend|map(attribute='total')|list|tojson }},
+                borderColor: '#7C3AED',
+                backgroundColor: 'rgba(124, 58, 237, 0.12)',
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0, callback: v => '\u20b1' + v.toLocaleString() } } }
+        }
+    });
+}
 
 new Chart(document.getElementById('deptChart'), {
     type: 'doughnut',
